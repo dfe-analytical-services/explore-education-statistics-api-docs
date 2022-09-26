@@ -1,0 +1,41 @@
+---
+title: Versioning
+last_reviewed_on: 2022-10-05
+review_in: 6 months
+weight: 2
+---
+
+# Versioning
+
+The Explore Education Statistics API uses URL-based versioning. Each endpoint encodes its current
+version within its URL e.g. `/api/v1/the-endpoint`, `/api/v2/the-endpoint`, etc.
+
+When backwards-incompatible changes to an endpoint are unavoidable, a new version of the endpoint
+will be published. Backwards-incompatible changes may include things like:
+
+- removing properties in the request or response schema
+- changing the structure of the request or response schema
+- changing validation rules for the request
+
+In the event that a new endpoint version is necessary, the previous version(s) of the endpoint will
+be maintained for as long as possible. This should provide ample opportunity to migrate to the new
+endpoint version. If necessary, guidance may be provided to support migrating to the new version.
+
+## Data set stability
+
+Data sets available through this API should be amongst the most stable offered by Explore education
+statistics, however, changes may be introduced to these data sets over time.
+
+The following things can change:
+
+- new facets can be added
+- new data values can be added
+- a facet's human-readable label
+- existing data values can be changed or removed
+
+The following guarantees can be made in terms of stability:
+
+- a facet's identifier is permanent
+- existing facets cannot be deleted
+
+Integrations that query data sets are not expected to break when new releases are published.

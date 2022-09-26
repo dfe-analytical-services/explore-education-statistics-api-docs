@@ -1,0 +1,28 @@
+<%= description %>
+
+<% if schema.enum %>
+Available options:
+
+<% schema.enum.each do |item| %>
+- `<%= item %>`
+<% end %>
+<% end %>
+
+<%# TODO: Add other validation rules  %>
+<% unless schema.minimum.nil? && schema.maximum.nil? && schema.format.nil? %>
+<% if schema.minimum %>
+- <%= schema.exclusive_minimum? ? 'Minimum (exclusive)' : 'Minimum' %>: `<%= schema.minimum %>`
+<% end %>
+
+<% if schema.maximum %>
+- <%= schema.exclusive_maximum? ? 'Maximum (exclusive)' : 'Maximum' %>: `<%= schema.maximum %>`
+<% end %>
+
+<% if schema.format %>
+- Format: `<%= schema.format %>`
+<% end %>
+<% end %>
+
+<% if schema.default %>
+Defaults to: `<%= schema.default %>`
+<% end %>

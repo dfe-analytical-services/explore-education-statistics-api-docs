@@ -1,0 +1,67 @@
+---
+title: How to get CSV data
+last_reviewed_on: 2022-10-06
+review_in: 6 months
+weight: 2
+---
+
+# How to get CSV data
+
+In this guide, you'll learn how to get CSV data from the Explore education statistics (EES) API.
+This may be particularly useful if you wish to access data sets in their entirety, or find it more
+comfortable to work with CSVs.
+
+## What you'll need
+
+You should already be familiar with the EES API. If not, you should read the [Quick start](/getting-started/quick-start/)
+guide first as this guide will presume some prior knowledge.
+
+To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
+tool. Good recommendations for beginners are [Postman](https://www.postman.com/)
+or [Insomnia](https://insomnia.rest/).
+
+Some prior knowledge of working with your chosen HTTP client will be necessary to work with the
+examples.
+
+## Get an entire data set as a CSV file
+
+Every data set is created from an underlying CSV file that **all** the data. You may find it useful
+(or necessary) to work with the underlying CSV instead of interacting with the data set via the API.
+
+The underlying CSV file can be downloaded via the [Get a data set's underlying CSV file](/endpoints/GetDataSetFile/)
+endpoint. To use this endpoint, you need to make the follow `GET` request:
+
+```
+GET <%= api_url "/api/v1/data-sets/{dataSetId}/file" %>
+```
+
+In the request URL, you would substitute the `{dataSetId}` parameter with your chosen data set's ID.
+
+Upon making this request, a download should start. The download will contain a ZIP archive containing
+the underlying CSV file.
+
+Data set CSV files are compressed using ZIP as they can be quite large and reach into hundreds of
+megabytes in size.
+
+## Get data set query results in CSV format
+
+Queries can be ran against data sets to find data matching specific criteria using the
+[Query a data set](/endpoints/QueryDataSet/) endpoint. By default, this endpoint returns the data in
+JSON format, however, you can also request to return it in CSV format.
+
+You can do this by changing the `POST` request's `Accept` header to `text/csv`. This would look
+something like the following:
+
+```
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+Accept: text/csv
+
+{
+  # your query
+}
+```
+
+As usual, substitute the `{dataSetId}` parameter with your chosen data set's ID.
+
+The CSV data will be formatted as it would appear in the full data set CSV file, but it is filtered
+down to only contain the data that matches your query.

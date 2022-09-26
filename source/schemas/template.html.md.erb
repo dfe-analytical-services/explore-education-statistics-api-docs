@@ -1,0 +1,55 @@
+# <%= title %>
+
+<% if schema.description %>
+<%= schema.description %>
+<% end %>
+
+<% if schema.enum %>
+Available options:
+
+<% schema.enum.each do |item| %>
+- `<%= item %>`
+<% end %>
+<% end %>
+
+<% if schema.properties.any? %>
+## Properties
+
+<table>
+  <thead>
+  <tr>
+    <th scope="col">Property</th>
+    <th scope="col">Type</th>
+    <th scope="col">Required</th>
+    <th scope="col">Description</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% schema.properties.each do |name, property| %>
+    <tr>
+      <td><code class="dfe-word-break--normal"><%= name %></code></td>
+      <td><%= render_schema_type(property) %></td>
+      <td><%= schema.requires?(property) %></td>
+      <td>
+        <%= partial("partials/schema_description", :locals => {
+          description: property.description,
+          schema: property
+        }) %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<% end %>
+
+<% if schema.type == "object" || schema.type == "array" %>
+## Example schema
+
+<% schema_json = json_pretty(schema_example(schema)) %>
+
+<% unless schema_json.blank? %>
+```json
+<%= schema_json %>
+```
+<% end %>
+<% end %>

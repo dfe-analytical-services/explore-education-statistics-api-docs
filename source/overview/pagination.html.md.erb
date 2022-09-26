@@ -1,0 +1,70 @@
+---
+title: Pagination
+last_reviewed_on: 2022-10-05
+review_in: 6 months
+weight: 1
+---
+
+# Pagination
+
+Endpoints that return a list of results may return a paginated response. This is done for
+performance reasons to avoid excessively large responses so not all possible results can be
+returned in a single request.
+
+The list of results is split into multiple pages (or 'batches') that must be requested separately.
+
+A typical paginated response looks like the following:
+
+```json
+{
+  "_links": {
+    "self": {
+      "href": "/the-endpoint"
+    },
+    "next": {
+      "href": "/the-endpoint?page=2"
+    }
+  },
+  "paging" : {
+    "page" : 1,
+    "pageSize" : 3,
+    "totalPages" : 2,
+    "totalResults" : 5
+  },
+  "results" : [
+    { "id": 1 },
+    { "id": 2 },
+    { "id": 3 }
+  ]
+}
+```
+
+In the above example, the `paging` property contains paging metadata. This metadata tells you that
+there are 5 results (denoted by `totalResults`) split over 2 pages (denoted by `totalPages`).
+The `pageSize` property indicates the maximum number of results that can be shown in a single page.
+
+Typically, you need to provide a `page` query parameter in the URL to specify the page of results
+you want. In the above example, you would use a URL like `/the-endpoint?page=2` to get the second
+page of results.
+
+Some endpoints may allow you to control the page size, meaning that you can adjust the number of
+results each page contains. In these cases, a `pageSize` query parameter can be used e.g.
+`/the-endpoint?pageSize=5` requests that each page contains 5 results.
+
+The `pageSize` parameter is not always available and may be subject to validation to prevent
+excessively large pages.
+
+## Use links for faster navigation
+
+For convenience, the top-level `_links` property will indicate other URLs that you can navigate to
+for more results. You will typically see the following:
+
+- `self` links to the current page of results
+- `next` links to the next page of results
+- `prev` links to the previous page of results
+
+The `prev` and `next` links will only be present if the respective page actually exists. This means
+that they will not be available at the pagination boundaries.
+
+The `_links` property can be particuarly useful if you wish to create a UI for navigating through
+paginated results.

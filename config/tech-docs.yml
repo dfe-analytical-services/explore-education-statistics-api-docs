@@ -1,0 +1,37 @@
+# Host to use for canonical URL generation (without trailing slash)
+host: https://docs.explore-education-statistics.service.gov.uk
+contact_email: explore.statistics@education.gov.uk
+
+# Header-related options
+show_govuk_logo: false
+service_name: Explore education statistics API
+service_link: https://docs.explore-education-statistics.service.gov.uk
+phase: Beta
+
+# Links to show on right-hand-side of header
+header_links:
+  Support: /support
+footer_links:
+  Accessibility: /accessibility/
+
+# Table of contents depth – how many levels to include in the table of contents.
+# If your ToC is too long, reduce this number and we'll only show higher-level
+# headings.
+max_toc_heading_level: 1
+
+api_path: https://api.swaggerhub.com/apis/ntsim/ees-public-data-api/1.0.0
+
+# Multi-page options
+multipage_nav: true
+collapsible_nav: true
+
+# Show links to contribute on GitHub
+show_contribution_banner: true
+github_repo: dfe-analytical-services/explore-education-statistics
+
+# Enable search
+enable_search: true
+
+# Ownership for page reviews
+default_owner_slack: '#alerts'
+owner_slack_workspace: exploreeducationstats

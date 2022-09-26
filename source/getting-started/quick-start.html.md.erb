@@ -1,0 +1,444 @@
+---
+title: Quick start
+last_reviewed_on: 2022-10-06
+review_in: 6 months
+weight: 1
+---
+
+# Quick start
+
+In this guide, you'll learn about how the Explore education statistics (EES) API is structured and
+how to use it to perform a basic data query.
+
+## What you'll need
+
+To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
+tool. Good recommendations for beginners are [Postman](https://www.postman.com/)
+or [Insomnia](https://insomnia.rest/).
+
+Some prior knowledge of working with your chosen HTTP client will be necessary to work with the
+examples.
+
+## API fundamentals
+
+To become productive with the API, it will be important to understand some fundamental concepts
+before proceeding.
+
+### How endpoints are organised
+
+The API endpoints are organised in a way that reflects how data is organised in EES.
+
+Data is published in **publications**. Each publication covers a specific topic such as
+schools or higher education.
+
+A publication will contain **data sets** that are relevant to the particular topic. Data sets are
+composed of data that has been collected over a period of time at varying geographic levels e.g. for
+local authorities. Updates to data sets are typically published at regular intervals e.g. yearly,
+monthly, etc.
+
+Given the above, the API exposes endpoints that mirror this:
+
+- publication endpoints: `/publications`
+- data set endpoints: `/data-sets`
+
+### A typical endpoint response
+
+Endpoint responses are typically encoded in JSON and will nearly always take the following shape:
+
+```json
+{
+  "_links": {
+    "self": {
+      "href": "/api/v1/the-endpoint"
+    },
+    "relatedThing": {
+      "href": "/api/v1/the-endpoint/related-thing"
+    }
+  }
+}
+```
+
+Responses follow the JSON-HAL convention of containing a `_links` property. Within the `_links`
+property is a dictionary of links to related endpoints where additional requests can be made. In the
+above example, you can see that there are links to a `relatedThing` endpoint and `self` (the current
+endpoint).
+
+Usage of `_links` properties is optional, but these can provide useful shortcuts when trying to
+navigate between related endpoints.
+
+## Workflow for querying data
+
+To query the data available on the API, this will require the following steps:
+
+1. Find the publication you are interested in
+2. Find the data set you interested in (from the publication)
+3. Get the data set's metadata
+4. Create and run a query against the data set
+
+In the following sections, this guide will walk you through how to perform the above steps.
+
+### Step 1: Find a publication
+
+To find a publication that you may be interested in, you'll need to make a `GET` request to the
+[List publications](/endpoints/ListPublications/) endpoint:
+
+```
+GET <%= api_url "/api/v1/publications" %>
+```
+
+This endpoint will respond with something like the following (parts have been omitted for brevity):
+
+```json
+{
+  "paging" : {
+    "page" : 1,
+    "pageSize" : 20,
+    "totalPages" : 1,
+    "totalResults" : 2
+  },
+  "results" : [
+    {
+      "_links" : {
+        "dataSets" : {
+          "href" : "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets"
+        },
+        "self" : {
+          "href" : "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad"
+        }
+      },
+      "id" : "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
+      "slug" : "Pupil-absence-in-schools-in-England",
+      "title" : "Pupil absence in schools in England"
+    }
+  ]
+}
+```
+
+This endpoint does not return all publications in a single request. Instead, it is **paginated**
+and returns the publications in pages (or batches), with each page containing a maximum number of
+publications.
+
+You can request additional pages of publications by appending a `page` query parameter to the
+endpoint URL. For example:
+
+```
+# Fetch page 2
+GET <%= api_url "/api/v1/publications?page=2" %>
+
+# Fetch page 3
+GET <%= api_url "/api/v1/publications?page=3" %>
+```
+
+To make it easier to find a specific publication, you can append a `search` query parameter to the
+URL as well. The following example would search for publications matching the term 'pupil absence':
+
+```
+GET <%= api_url "/api/v1/publications?search=pupil+absence" %>
+```
+
+Like a typical URL, you can combine query parameters together with `&`. For example, you would use
+the following URL to get page 2 of publications matching the term 'pupil absence':
+
+```
+GET <%= api_url "/api/v1/publications?search=pupil+absence&page=2" %>
+```
+
+Once you find a publication you are interested in, proceed to the next step.
+
+### Step 2: Find a data set
+
+Now that you have a publication that you are interested, you can use this to find data sets related
+to it. This can be done using
+the [List a publication's data sets](/endpoints/ListPublicationDataSets/)
+endpoint:
+
+```
+GET <%= api_url "/api/v1/publications/{publicationId}/data-sets" %>
+```
+
+For this endpoint URL, you would substitute the `{publicationId}` parameter with the `id` of the
+publication you are interested in.
+
+For example, given the following publication (parts omitted for brevity):
+
+```json
+{
+  "id" : "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
+  "slug" : "Pupil-absence-in-schools-in-England",
+  "title" : "Pupil absence in schools in England"
+}
+```
+
+You would make the following `GET` request:
+
+```
+GET <%= api_url "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets" %>
+```
+
+For convenience, the URL to this endpoint is also provided by the publication's `_links` property.
+You can find this under the `dataSets` key:
+
+```json
+{
+  "_links" : {
+    "dataSets" : {
+      "href" : "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets"
+    }
+  }
+}
+```
+
+It does not matter if you manually substitute the publication `id` into URL or use the URL from the
+`_links` property. Both options will respond with a list of the publication's data sets and this
+will look like the following:
+
+```json
+[
+  {
+    "id": "63cfc86e-c334-4e58-2912-08da0807d53c",
+    "content": "<p>Absence information for full academic year 2020/21 for pupils aged 5-15.</p>",
+    "geographicLevels": [
+      "National"
+    ],
+    "name": "Absence rates",
+    "timePeriods": {
+      "start": "2020/21",
+      "end": "2020/21"
+    }
+  }
+]
+```
+
+Each data set provides high-level information about its contents. Metadata about the data set's
+geographic levels and time periods are also provided. You can use all of this information to help
+identify a data set that you would be interested in looking at further.
+
+Once you have chosen a data set, proceed to the next step.
+
+### Step 3: Get the data set's metadata
+
+Now that you have a chosen a data set, you'll want to query it for some data. To create a query,
+you'll need to use the [Get a data set's metadata](/endpoints/GetDataSetMeta/) endpoint. This
+provides information about all the filterable facets and indicators available to a data set.
+
+**Facets** are specific features/characteristics of the data. These are used in a data set query to
+filter down the data that is returned.
+
+Some examples of facets include:
+
+- time periods e.g. 2022/23 (academic year), 2023 (calendar year), January (month), Week 1 (week)
+- locations e.g. England (country), Yorkshire (region), Sheffield (local authority)
+- characteristics e.g. female (gender), state-funded primary (school type), FSM eligible (free
+  school meals)
+
+**Indicators** are types of data values that were collected, for example:
+
+- numbers (of pupils, sessions, etc)
+- rates of change
+- proportions/percentages
+
+Both facets and indicators need to be part of a query for data to be returned.
+
+Facets and indicators are collectively referenced as a data set's **metadata**. To fetch this for
+your chosen data set, make the following `GET` request:
+
+```
+GET <%= api_url "/api/v1/data-sets/{dataSetId}/meta" %>
+```
+
+Again, you would substitute in the `{dataSetId}` parameter with the `id` of your chosen data set.
+You can also use the `meta` link from the data set's `_links` property to navigate to this directly.
+
+The endpoint will return something that looks like the following:
+
+```json
+{
+  "indicators": [
+    {
+      "id": "772c60cd-d8eb-40c8-5ae9-08da0b95637f",
+      "label": "Number of authorised absence sessions",
+      "name": "sess_authorised",
+      "unit": "",
+      "decimalPlaces": 0
+    }
+  ],
+  "locations": [
+    {
+      "id": "058416da-0cae-4958-aa00-203d745858ae",
+      "label": "England",
+      "level": "Country",
+      "code": "E92000001",
+      "options": [
+        {
+          "id": "6b0c3349-34c4-48d4-aa6e-745ab358acc1",
+          "label": "North East",
+          "level": "Region",
+          "code": "E12000001"
+        }
+      ]
+    }
+  ],
+  "timePeriods": [
+    {
+      "code": "AY",
+      "label": "2022/23",
+      "year": 2022
+    }
+  ],
+  "filters": [
+    {
+      "label": "School type",
+      "name": "school_type",
+      "options": [
+        {
+          "id": "0d194014-8d2a-4abc-8b1f-e7ae899e8eb3",
+          "label": "All",
+          "isAggregate": true
+        },
+        {
+          "id": "b936e2a5-a082-443c-a2ce-2c24195ad664",
+          "label": "State-funded primary"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Time periods and locations are mandatory facets and can be found at the top-level of the response
+under `timePeriods` and `locations`. These will always appear in the metadata.
+
+Non-core facets are optional and can be found under the `filters` key. These are grouped by their
+filter type (e.g. school type) and will vary per data set.
+
+There are some other notable features in the metadata:
+
+- Facets can be grouped hierarchically via the `options` property. This can be seen in the above
+  example's locations, where the region 'North East' is in a subgroup of the country 'England'.
+- Some facets are aggregates (i.e. 'all' or 'total') of other facets within the same group.
+  An aggregate facet is marked by an `isAggregate` property that is set to true. The above example
+  shows an aggregate facet for 'All' school types (this would include primary, secondary, special
+  schools, etc).
+- Time periods are represented by a `code` and a `year`. The `code` describes the granularity of
+  the time period. A full list of codes (and their descriptions) is located in the documentation
+  for the [TimePeriodCode schema](/schemas/TimePeriodCode/).
+
+At this point, spend some time getting familiarised with the metadata response. When you are ready,
+proceed to the next step.
+
+### Step 4: Create and run your data set query
+
+In this final step, you'll need to use the metadata from the previous step to create and run your
+query against the [Query a data set](/endpoints/QueryDataSet/) endpoint.
+
+To use this endpoint, a `POST` request needs to be sent to the endpoint URL with a request body. It
+should look like the following:
+
+```
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+{
+  "filterItems": [],
+  "timePeriod": {
+    "startYear": 0,
+    "startCode": "",
+    "endYear": 0,
+    "endCode": ""
+  },
+  "indicators": [],
+  "locations": []
+}
+```
+
+As seen previously, you need to substitute the `{dataSetId}` parameter with the `id` of your chosen
+data set.
+
+In the request body, you would substitute in values from the metadata into the query to return
+relevant data. You specifically need to substitute in the following:
+
+- `filterItems` - the IDs of the filter items
+- `timePeriod` - the start/end time period year and codes
+- `indicators` - the IDs of indicators
+- `locations` - the IDs or codes (if available) of locations
+
+For example, using the metadata example from the previous step, you could create query like the following:
+
+```json
+{
+  "filterItems": ["b936e2a5-a082-443c-a2ce-2c24195ad664"],
+  "timePeriod": {
+    "startYear": 2022,
+    "startCode": "AY",
+    "endYear": 2022,
+    "endCode": "AY"
+  },
+  "indicators": ["772c60cd-d8eb-40c8-5ae9-08da0b95637f"],
+  "locations": ["6b0c3349-34c4-48d4-aa6e-745ab358acc1"]
+}
+```
+
+The above example would query for the number of authorised absence sessions (indicator
+`772c60cd-d8eb-40c8-5ae9-08da0b95637f`) matching the follow facets:
+
+- state-funded primary schools (filter item `b936e2a5-a082-443c-a2ce-2c24195ad664`)
+- the North East of England (location `6b0c3349-34c4-48d4-aa6e-745ab358acc1`)
+- academic year 2022/23 (time period code `AY` and year `2022`)
+
+You can create more complex queries by adding more IDs into the respective parts of the query.
+
+Once you have created your query, make the `POST` request to the endpoint. You should receive a
+response that looks like:
+
+```json
+{
+  "footnotes": [
+    {
+      "id": "bf89061a-0180-42e1-0b3d-08da372be1c6",
+      "content": "A footnote about the data."
+    }
+  ],
+  "results": [
+    {
+      "id": "625b36de-4855-410a-6add-08da0b95637f",
+      "filterItemIds": [
+        "b936e2a5-a082-443c-a2ce-2c24195ad664",
+        "1df4d473-0a9f-4171-9194-8b5ed747f87d"
+      ],
+      "geographicLevel": "Region",
+      "locationId": "6b0c3349-34c4-48d4-aa6e-745ab358acc1",
+      "values": {
+        "772c60cd-d8eb-40c8-5ae9-08da0b95637f": "1708016"
+      },
+      "timePeriod": {
+        "code": "AY",
+        "year": 2020
+      }
+    }
+  ]
+}
+```
+
+The `results` part of this response contains a list where each item is a facet combination and the
+data matching it. The data itself can be found in each result's `values` property.
+
+The `values` property is a dictionary where the key is the ID of the indicator and the value is the
+data collected. In the above example, the number of authorised absence sessions (indicator
+`772c60cd-d8eb-40c8-5ae9-08da0b95637f`) is 1708016.
+
+Note that reported values may not be numeric. It may not be possible to report the data (e.g.
+due to suppression for anonymity) and some placeholder value may be used instead.
+
+The `footnotes` property provides a list of footnotes associated with the results. These provide
+extra information that you should be aware of whilst using this data.
+
+Spend some time getting familiar with the structure of the results and try to find the values that
+you are interested in.
+
+## Conclusions
+
+This quick start guide has now run you through a basic workflow for retrieving some data from the
+EES API. The core workflow is the same for all data sets. The majority of use-cases will simply
+require you to adjust the parameters used.
+
+You now have all the tools to get started with the API, but we encourage you to explore the
+documentation further. It is recommended that you read the [Overview section](/overview/) to
+get a better understanding of the core API features.
