@@ -9,9 +9,8 @@ GovukTechDocs.configure(self, livereload: { js_host: "localhost", host: "127.0.0
 
 helpers Helpers
 activate :api_reference_pages
-activate :directory_indexes
-activate :relative_assets
 
+activate :relative_assets
 set :relative_links, true
 
 # Disable HTMLProofer until we can use absolute URLs.
