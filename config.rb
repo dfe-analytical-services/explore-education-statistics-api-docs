@@ -16,19 +16,16 @@ activate :api_reference_pages
 activate :relative_assets
 set :relative_links, true
 
-# Disable HTMLProofer until we can use absolute URLs.
-# We currently have to use relative URLs to make this work on a GitHub Pages subdomain.
-#
-# after_build do |builder|
-#   begin
-#     HTMLProofer.check_directory(config[:build_dir],
-#       {
-#         :disable_external => true,
-#         :swap_urls => {
-#           config[:tech_docs][:host] => "",
-#         }
-#       }).run
-#   rescue RuntimeError => e
-#     abort e.to_s
-#   end
-# end
+after_build do |builder|
+  begin
+    HTMLProofer.check_directory(config[:build_dir],
+      {
+        :disable_external => true,
+        :swap_urls => {
+          config[:tech_docs][:host] => "",
+        }
+      }).run
+  rescue RuntimeError => e
+    abort e.to_s
+  end
+end
