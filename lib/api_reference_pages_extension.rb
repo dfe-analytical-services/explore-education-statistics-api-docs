@@ -1,5 +1,5 @@
 class ApiReferencePagesExtension < Middleman::Extension
-  expose_to_template :schema_example, :render_schema_type, :api_url
+  expose_to_template :api_url
 
   def initialize(app, options_hash = {}, &block)
     super
@@ -46,77 +46,6 @@ class ApiReferencePagesExtension < Middleman::Extension
     end
 
     resources + new_resources
-  end
-
-  # @param [Openapi3Parser::Node::Schema] schema_data
-  # @return [*]
-  def schema_example(schema_data)
-    if schema_data.example
-      return schema_data.example
-    end
-
-    if is_primitive_schema(schema_data)
-      return primitive_schema_example(schema_data)
-    end
-
-    if schema_data.type == "array"
-      items = schema_data.items
-      return items ? [schema_example(items)] : []
-    end
-
-    # TODO - Implement other complex schemas anyOf, oneOf, not, etc
-
-    properties = schema_data.properties.to_h
-
-    schema_data.all_of.to_a.each do |all_of_schema|
-      properties.merge!(all_of_schema.properties.to_h)
-    end
-
-    properties = properties.each_with_object({}) do |(name, schema), memo|
-      memo[name] = case schema.type
-                   when "object"
-                     schema_example(schema)
-                   when "array"
-                     schema.items && schema.items != schema_data ? [schema_example(schema.items)] : []
-                   else
-                     primitive_schema_example(schema)
-                   end
-    end
-
-    if schema_data.additional_properties?
-      properties["<*>"] = schema_example(schema_data.additional_properties_schema)
-    end
-
-    properties
-  end
-
-  # @param [Openapi3Parser::Node::Schema] schema
-  # @return [String]
-  def render_schema_type(schema)
-    if schema.type == "object"
-      unless schema.name
-        if schema.additional_properties?
-          return "dictionary (#{render_schema_type(schema.additional_properties_schema)})"
-        end
-
-        return "object"
-      end
-      "<a href='/schemas/#{schema.name}/'>#{schema.name}</a>"
-    elsif schema.type == "array"
-      items = schema.items
-
-      if items.nil?
-        return "array"
-      end
-
-      if items.type == "object" && items.name
-        "array (<a href='/schemas/#{items.name}/'>#{items.name}</a>)"
-      else
-        "array (#{render_schema_type(items)})"
-      end
-    else
-      schema.type || ""
-    end
   end
 
   private
@@ -180,33 +109,6 @@ class ApiReferencePagesExtension < Middleman::Extension
       "delete" => path.delete,
       "patch" => path.patch,
     }.compact
-  end
-
-  # @param [Openapi3Parser::Node::Schema] schema
-  # @return [String, Number, Boolean]
-  def primitive_schema_example(schema)
-    case schema.type
-    when "string"
-      schema.format ? "string(#{schema.format})" : "string"
-    when "number", "integer"
-      0
-    when "boolean"
-      true
-    else
-      raise "Invalid primitive schema type: #{schema.type}"
-    end
-  end
-
-  # @param [Openapi3Parser::Node::Schema] schema
-  # @return [Boolean]
-  def is_complex_schema(schema)
-    !!(schema.all_of || schema.any_of || schema.one_of || schema.not)
-  end
-
-  # @param [Openapi3Parser::Node::Schema] schema
-  # @return [Boolean]
-  def is_primitive_schema(schema)
-    !is_complex_schema(schema) && !schema.type.nil? && schema.type != "object" && schema.type != "array"
   end
 
   # @param [String] string

@@ -13,7 +13,7 @@ comfortable to work with CSVs.
 
 ## What you'll need
 
-You should already be familiar with the EES API. If not, you should read the [Quick start](/getting-started/quick-start/)
+You should already be familiar with the EES API. If not, you should read the [Quick start](/getting-started/quick-start/index.html)
 guide first as this guide will presume some prior knowledge.
 
 To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
@@ -28,7 +28,7 @@ examples.
 Every data set is created from an underlying CSV file that **all** the data. You may find it useful
 (or necessary) to work with the underlying CSV instead of interacting with the data set via the API.
 
-The underlying CSV file can be downloaded via the [Get a data set's underlying CSV file](/endpoints/GetDataSetFile/)
+The underlying CSV file can be downloaded via the [Get a data set's underlying CSV file](/endpoints/GetDataSetFile/index.html)
 endpoint. To use this endpoint, you need to make the follow `GET` request:
 
 ```
@@ -46,7 +46,7 @@ megabytes in size.
 ## Get data set query results in CSV format
 
 Queries can be ran against data sets to find data matching specific criteria using the
-[Query a data set](/endpoints/QueryDataSet/) endpoint. By default, this endpoint returns the data in
+[Query a data set](/endpoints/QueryDataSet/index.html) endpoint. By default, this endpoint returns the data in
 JSON format, however, you can also request to return it in CSV format.
 
 You can do this by changing the `POST` request's `Accept` header to `text/csv`. This would look

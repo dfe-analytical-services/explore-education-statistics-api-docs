@@ -80,7 +80,7 @@ In the following sections, this guide will walk you through how to perform the a
 ### Step 1: Find a publication
 
 To find a publication that you may be interested in, you'll need to make a `GET` request to the
-[List publications](/endpoints/ListPublications/) endpoint:
+[List publications](/endpoints/ListPublications/index.html) endpoint:
 
 ```
 GET <%= api_url "/api/v1/publications" %>
@@ -149,7 +149,7 @@ Once you find a publication you are interested in, proceed to the next step.
 
 Now that you have a publication that you are interested, you can use this to find data sets related
 to it. This can be done using
-the [List a publication's data sets](/endpoints/ListPublicationDataSets/)
+the [List a publication's data sets](/endpoints/ListPublicationDataSets/index.html)
 endpoint:
 
 ```
@@ -218,7 +218,7 @@ Once you have chosen a data set, proceed to the next step.
 ### Step 3: Get the data set's metadata
 
 Now that you have a chosen a data set, you'll want to query it for some data. To create a query,
-you'll need to use the [Get a data set's metadata](/endpoints/GetDataSetMeta/) endpoint. This
+you'll need to use the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint. This
 provides information about all the filterable facets and indicators available to a data set.
 
 **Facets** are specific features/characteristics of the data. These are used in a data set query to
@@ -321,7 +321,7 @@ There are some other notable features in the metadata:
   schools, etc).
 - Time periods are represented by a `code` and a `year`. The `code` describes the granularity of
   the time period. A full list of codes (and their descriptions) is located in the documentation
-  for the [TimePeriodCode schema](/schemas/TimePeriodCode/).
+  for the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
 
 At this point, spend some time getting familiarised with the metadata response. When you are ready,
 proceed to the next step.
@@ -329,7 +329,7 @@ proceed to the next step.
 ### Step 4: Create and run your data set query
 
 In this final step, you'll need to use the metadata from the previous step to create and run your
-query against the [Query a data set](/endpoints/QueryDataSet/) endpoint.
+query against the [Query a data set](/endpoints/QueryDataSet/index.html) endpoint.
 
 To use this endpoint, a `POST` request needs to be sent to the endpoint URL with a request body. It
 should look like the following:
@@ -440,5 +440,5 @@ EES API. The core workflow is the same for all data sets. The majority of use-ca
 require you to adjust the parameters used.
 
 You now have all the tools to get started with the API, but we encourage you to explore the
-documentation further. It is recommended that you read the [Overview section](/overview/) to
+documentation further. It is recommended that you read the [Overview section](/overview/index.html) to
 get a better understanding of the core API features.
