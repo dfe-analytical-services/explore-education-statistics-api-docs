@@ -2,6 +2,7 @@ require 'govuk_tech_docs'
 require 'lib/api_reference_pages_extension'
 require 'lib/helpers'
 require 'lib/api_reference_helpers'
+require 'lib/govuk_tech_docs/path_helpers'
 
 # Check for broken links
 require 'html-proofer'
