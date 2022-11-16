@@ -93,8 +93,8 @@ This endpoint will respond with something like the following (parts have been om
   "paging" : {
     "page" : 1,
     "pageSize" : 20,
-    "totalPages" : 1,
-    "totalResults" : 2
+    "totalPages" : 3,
+    "totalResults" : 50
   },
   "results" : [
     {
@@ -128,6 +128,18 @@ GET <%= api_url "/api/v1/publications?page=2" %>
 # Fetch page 3
 GET <%= api_url "/api/v1/publications?page=3" %>
 ```
+
+The possible values of `page` will be dictated by the total number of results (across all pages)
+and the `pageSize` query parameter. For example, the following request would show 30 results per
+page instead of the default:
+
+```
+GET <%= api_url "/api/v1/publications?page=1&pageSize=30" %>
+```
+
+Each page of results contains a `paging` property which describes the current page and the total
+numbers of pages and results. This information can be used to set the query parameters for the next
+page of results.
 
 To make it easier to find a specific publication, you can append a `search` query parameter to the
 URL as well. The following example would search for publications matching the term 'pupil absence':
@@ -253,9 +265,10 @@ The endpoint will return something that looks like the following:
 
 ```json
 {
+  "totalResults": 1000,
   "indicators": [
     {
-      "id": "772c60cd-d8eb-40c8-5ae9-08da0b95637f",
+      "id": "772c60cd",
       "label": "Number of authorised absence sessions",
       "name": "sess_authorised",
       "unit": "",
@@ -264,13 +277,13 @@ The endpoint will return something that looks like the following:
   ],
   "locations": [
     {
-      "id": "058416da-0cae-4958-aa00-203d745858ae",
+      "id": "058416da",
       "label": "England",
       "level": "Country",
       "code": "E92000001",
       "options": [
         {
-          "id": "6b0c3349-34c4-48d4-aa6e-745ab358acc1",
+          "id": "6b0c3349",
           "label": "North East",
           "level": "Region",
           "code": "E12000001"
@@ -291,12 +304,12 @@ The endpoint will return something that looks like the following:
       "name": "school_type",
       "options": [
         {
-          "id": "0d194014-8d2a-4abc-8b1f-e7ae899e8eb3",
+          "id": "0d194014",
           "label": "All",
           "isAggregate": true
         },
         {
-          "id": "b936e2a5-a082-443c-a2ce-2c24195ad664",
+          "id": "b936e2a5",
           "label": "State-funded primary"
         }
       ]
@@ -322,6 +335,8 @@ There are some other notable features in the metadata:
 - Time periods are represented by a `code` and a `year`. The `code` describes the granularity of
   the time period. A full list of codes (and their descriptions) is located in the documentation
   for the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
+- The total number of results in this data can be found in `totalResults`. You can use this to set
+  custom pagination parameters before querying data.
 
 At this point, spend some time getting familiarised with the metadata response. When you are ready,
 proceed to the next step.
@@ -364,23 +379,23 @@ For example, using the metadata example from the previous step, you could create
 
 ```json
 {
-  "filterItems": ["b936e2a5-a082-443c-a2ce-2c24195ad664"],
+  "filterItems": ["b936e2a5"],
   "timePeriod": {
     "startYear": 2022,
     "startCode": "AY",
     "endYear": 2022,
     "endCode": "AY"
   },
-  "indicators": ["772c60cd-d8eb-40c8-5ae9-08da0b95637f"],
-  "locations": ["6b0c3349-34c4-48d4-aa6e-745ab358acc1"]
+  "indicators": ["772c60cd"],
+  "locations": ["6b0c3349"]
 }
 ```
 
-The above example would query for the number of authorised absence sessions (indicator
-`772c60cd-d8eb-40c8-5ae9-08da0b95637f`) matching the follow facets:
+The above example would query for the number of authorised absence sessions (indicator `772c60cd`)
+matching the follow facets:
 
-- state-funded primary schools (filter item `b936e2a5-a082-443c-a2ce-2c24195ad664`)
-- the North East of England (location `6b0c3349-34c4-48d4-aa6e-745ab358acc1`)
+- state-funded primary schools (filter item `b936e2a5`)
+- the North East of England (location `6b0c3349`)
 - academic year 2022/23 (time period code `AY` and year `2022`)
 
 You can create more complex queries by adding more IDs into the respective parts of the query.
@@ -392,21 +407,26 @@ response that looks like:
 {
   "footnotes": [
     {
-      "id": "bf89061a-0180-42e1-0b3d-08da372be1c6",
+      "id": "bf89061a",
       "content": "A footnote about the data."
     }
   ],
+  "paging": {
+    "page": 1,
+    "pageSize": 100,
+    "totalResults": 150,
+    "totalPages": 2
+  },
   "results": [
     {
-      "id": "625b36de-4855-410a-6add-08da0b95637f",
-      "filterItemIds": [
-        "b936e2a5-a082-443c-a2ce-2c24195ad664",
-        "1df4d473-0a9f-4171-9194-8b5ed747f87d"
-      ],
+      "id": "625b36de",
+      "filters": {
+        "school_type": "b936e2a5"
+      },
       "geographicLevel": "Region",
-      "locationId": "6b0c3349-34c4-48d4-aa6e-745ab358acc1",
+      "locationId": "6b0c3349",
       "values": {
-        "772c60cd-d8eb-40c8-5ae9-08da0b95637f": "1708016"
+        "sess_authorised": "1708016"
       },
       "timePeriod": {
         "code": "AY",
@@ -420,9 +440,9 @@ response that looks like:
 The `results` part of this response contains a list where each item is a facet combination and the
 data matching it. The data itself can be found in each result's `values` property.
 
-The `values` property is a dictionary where the key is the ID of the indicator and the value is the
-data collected. In the above example, the number of authorised absence sessions (indicator
-`772c60cd-d8eb-40c8-5ae9-08da0b95637f`) is 1708016.
+The `values` property of each result is a dictionary where the key is the name of the indicator
+and the value is the data collected. In the above example, the number of authorised absence sessions
+(`sess_authorised`) is 1708016.
 
 Note that reported values may not be numeric. It may not be possible to report the data (e.g.
 due to suppression for anonymity) and some placeholder value may be used instead.
@@ -432,6 +452,29 @@ extra information that you should be aware of whilst using this data.
 
 Spend some time getting familiar with the structure of the results and try to find the values that
 you are interested in.
+
+#### Note on paginated data
+
+Like endpoints seen previously, the data set query's response is **paginated** meaning that the data
+is returned in multiple pages/batches. The `paging` property is returned as part of each response
+and describes the current page of data matching the query.
+
+You can set a `page` parameter in the request body to get other pages, and `pageSize` to adjust the
+number of results returned per page. For example (the query has been omitted for brevity):
+
+```json
+{
+  "filterItems": [...],
+  "timePeriod": {...},
+  "indicators": [...],
+  "locations": [...],
+  "page": 2,
+  "pageSize": 150
+}
+```
+
+The above would return page 2 of data that has been paginated to have a maximum of 150 results
+per page.
 
 ## Conclusions
 
