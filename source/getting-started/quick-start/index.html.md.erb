@@ -455,26 +455,17 @@ you are interested in.
 
 #### Note on paginated data
 
-Like endpoints seen previously, the data set query's response is **paginated** meaning that the data
-is returned in multiple pages/batches. The `paging` property is returned as part of each response
-and describes the current page of data matching the query.
+Like some endpoints seen previously, the data set query's response is **paginated** meaning that the
+data is returned in multiple pages/batches. The `paging` property is returned as part of each
+response and describes the current page of data matching the query.
 
-You can set a `page` parameter in the request body to get other pages, and `pageSize` to adjust the
-number of results returned per page. For example (the query has been omitted for brevity):
+You can set `page` and `pageSize` parameters in the query string to request different pages of
+results. For example, the following request would fetch page 5, with each page containing
+a maximum of 200 data results:
 
-```json
-{
-  "filterItems": [...],
-  "timePeriod": {...},
-  "indicators": [...],
-  "locations": [...],
-  "page": 2,
-  "pageSize": 150
-}
 ```
-
-The above would return page 2 of data that has been paginated to have a maximum of 150 results
-per page.
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query?page=5&pageSize=200" %>
+```
 
 ## Conclusions
 

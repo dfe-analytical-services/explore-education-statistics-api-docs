@@ -66,5 +66,31 @@ for more results. You will typically see the following:
 The `prev` and `next` links will only be present if the respective page actually exists. This means
 that they will not be available at the pagination boundaries.
 
-The `_links` property can be particuarly useful if you wish to create a UI for navigating through
+The `_links` property can be particularly useful if you wish to create a UI for navigating through
 paginated results.
+
+## Paging metadata in response headers
+
+Sometimes the paging metadata cannot be embedded in response body itself, for example, if the
+response format is specified to be CSV.
+
+In these cases, the paging metadata will be contained in the response headers instead. This will
+look like the following:
+
+```
+Page: 2
+Page-Size: 3
+Total-Results: 5
+Total-Pages: 5
+Link: </the-endpoint?page=1&pageSize=500>; rel="prev",
+      </the-endpoint?page=3&pageSize=500>; rel="next"
+```
+
+These headers map directly to the metadata found under the typical `paging` property seen in an
+paginated JSON responses.
+
+A notable difference here is that links are found in the `Link` header. This is outputted in a
+format described in [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288.html).
+
+Similar to links for a paginated JSON response, the `Link` header can be used to navigate directly
+to the previous or next page (if any exists).
