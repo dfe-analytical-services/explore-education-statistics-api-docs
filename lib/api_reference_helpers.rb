@@ -17,11 +17,7 @@ module ApiReferenceHelpers
 
     # TODO - Implement other complex schemas anyOf, oneOf, not, etc
 
-    properties = schema_data.properties.to_h
-
-    schema_data.all_of.to_a.each do |all_of_schema|
-      properties.merge!(all_of_schema.properties.to_h)
-    end
+    properties = get_schema_properties(schema_data)
 
     properties = properties.each_with_object({}) do |(name, schema), memo|
       memo[name] = case schema.type
@@ -36,6 +32,18 @@ module ApiReferenceHelpers
 
     if schema_data.additional_properties?
       properties["<*>"] = schema_example(schema_data.additional_properties_schema)
+    end
+
+    properties
+  end
+
+  # @param [Openapi3Parser::Node::Schema] schema
+  # @return [*]
+  def get_schema_properties(schema)
+    properties = schema.properties.to_h
+
+    schema.all_of.to_a.each do |all_of_schema|
+      properties.merge!(all_of_schema.properties.to_h)
     end
 
     properties

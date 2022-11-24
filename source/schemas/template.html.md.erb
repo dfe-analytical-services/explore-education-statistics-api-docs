@@ -12,7 +12,9 @@ Available options:
 <% end %>
 <% end %>
 
-<% if schema.properties.any? %>
+<% properties = get_schema_properties(schema)  %>
+
+<% if properties.any? %>
 ## Properties
 
 <table>
@@ -25,7 +27,7 @@ Available options:
   </tr>
   </thead>
   <tbody>
-  <% schema.properties.each do |name, property| %>
+  <% properties.each do |name, property| %>
     <tr>
       <td><code class="dfe-word-break--normal"><%= name %></code></td>
       <td><%= render_schema_type(property) %></td>
