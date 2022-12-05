@@ -1,7 +1,8 @@
 module ApiReferenceHelpers
   # @param [Openapi3Parser::Node::Schema] schema_data
+  # @param [Array<Openapi3Parser::Node::Schema>] references
   # @return [*]
-  def schema_example(schema_data)
+  def schema_example(schema_data, references = [])
     if schema_data.example
       return schema_data.example
     end
@@ -15,7 +16,11 @@ module ApiReferenceHelpers
       return items ? [schema_example(items)] : []
     end
 
-    # TODO - Implement other complex schemas anyOf, oneOf, not, etc
+    if schema_data.one_of
+      return schema_example(schema_data.one_of[0])
+    end
+
+    # TODO - Implement other complex schemas anyOf, not, etc
 
     properties = get_schema_properties(schema_data)
 
@@ -24,7 +29,17 @@ module ApiReferenceHelpers
                    when "object"
                      schema_example(schema)
                    when "array"
-                     schema.items && schema.items != schema_data ? [schema_example(schema.items)] : []
+                     if schema.items && schema.items != schema_data
+                       unless schema.items.one_of.nil?
+                         schema.items.one_of
+                               .reject { |item| references.include?(item) }
+                               .map { |item| schema_example(item, references + [item]) }
+                       else
+                         [schema_example(schema.items)]
+                       end
+                     else
+                       []
+                     end
                    else
                      Utils::primitive_schema_example(schema)
                    end
@@ -52,6 +67,13 @@ module ApiReferenceHelpers
   # @param [Openapi3Parser::Node::Schema] schema
   # @return [String]
   def render_schema_type(schema)
+    unless schema.one_of.nil?
+      schemas = schema.one_of.map { |s| "<li>#{render_schema_type(s)}</li>" }
+                      .join
+
+      return "one of: <ul>#{schemas}</ul>"
+    end
+
     if schema.type == "object"
       unless schema.name
         if schema.additional_properties?
