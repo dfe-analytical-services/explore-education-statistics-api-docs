@@ -6,6 +6,10 @@
   word-break: break-word;
 }
 
+.highlight {
+  position: relative;
+}
+
 .highlight code,
 table code  {
   font-size: 0.9rem !important;
