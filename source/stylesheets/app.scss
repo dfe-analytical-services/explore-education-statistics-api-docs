@@ -6,9 +6,10 @@
   word-break: break-word;
 }
 
-.highlight code {
-  font-size: 0.9rem;
-  line-height: 1;
+.highlight code,
+table code  {
+  font-size: 0.9rem !important;
+  line-height: 1 !important;
 }
 
 .dfe-word-break--normal {
