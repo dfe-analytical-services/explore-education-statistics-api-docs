@@ -275,27 +275,35 @@ The endpoint will return something that looks like the following:
       "decimalPlaces": 0
     }
   ],
-  "locations": [
-    {
-      "id": "058416da",
-      "label": "England",
-      "level": "Country",
-      "code": "E92000001",
-      "options": [
-        {
-          "id": "6b0c3349",
-          "label": "North East",
-          "level": "Region",
-          "code": "E12000001"
-        }
-      ]
-    }
-  ],
+  "locations": {
+    "Country": [
+      {
+        "id": "oB6baDW8",
+        "label": "England",
+        "level": "Country",
+        "code": "E92000001"
+      }
+    ],
+    "Region": [
+      {
+        "id": "YOeoaX6K",
+        "label": "North East",
+        "level": "Region",
+        "code": "E12000001"
+      },
+      {
+        "id": "kr60BOeG",
+        "label": "North West",
+        "level": "Region",
+        "code": "E12000002"
+      }
+    ]
+  },
   "timePeriods": [
     {
       "code": "AY",
       "label": "2022/23",
-      "year": 2022
+      "year": 202223
     }
   ],
   "filters": [
@@ -346,59 +354,89 @@ proceed to the next step.
 In this final step, you'll need to use the metadata from the previous step to create and run your
 query against the [Query a data set](/endpoints/QueryDataSet/index.html) endpoint.
 
-To use this endpoint, a `POST` request needs to be sent to the endpoint URL with a request body. It
-should look like the following:
+To use this endpoint, a `POST` request needs to be sent to the endpoint URL with an appropriate
+request body. The most basic request would look like the following:
 
 ```
 POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
 {
-  "filterItems": [],
-  "timePeriod": {
-    "startYear": 0,
-    "startCode": "",
-    "endYear": 0,
-    "endCode": ""
-  },
-  "indicators": [],
-  "locations": []
+  "query": {},
+  "indicators": []
 }
 ```
 
 As seen previously, you need to substitute the `{dataSetId}` parameter with the `id` of your chosen
 data set.
 
-In the request body, you would substitute in values from the metadata into the query to return
-relevant data. You specifically need to substitute in the following:
+The request body must contain `query` and `indicators` properties. These will need to be populated
+with facet IDs so that the response can return relevant data. The possible values are found in the
+data set metadata that was retrieved in the previous step.
 
-- `filterItems` - the IDs of the filter items
-- `timePeriod` - the start/end time period year and codes
-- `indicators` - the IDs of indicators
-- `locations` - the IDs or codes (if available) of locations
+The `indicators` property should simply contain a list of indicator IDs. The data values of the
+matching indicators will be returned as part of each result.
 
-For example, using the metadata example from the previous step, you could create query like the following:
+The `query` property must be an object and can contain any of the following facet sub-properties:
+
+| Facet type         | Description                              | Examples                              |
+|--------------------|------------------------------------------|---------------------------------------|
+| `filters`          | IDs of filter items                      | `Yy6yonLA`                            |
+| `timePeriods`      | time periods in `year` and `code` format | `{ "year": 202223, "code": "AY" }`    |
+| `locations`        | IDs (or codes) of locations              | `qn6OaRed`, `E08000019`               |
+| `parentLocations`  | IDs (or codes) of parent locations       | `oB6baDW8`, `E92000001`               |
+| `geographicLevels` | geographic level codes                   | `LocalAuthority`, `Region`, `Country` |
+
+All the facet sub-properties should be objects that describe how the respective facet values should
+be compared when filtering the results. The following comparators are typically permitted:
+
+| Comparator | Description                      | Example                                   |
+|------------|----------------------------------|-------------------------------------------|
+| `eq`       | equal to a value                 | `"eq": "facet-id"`                        |
+| `notEq`    | not equal to a value             | `"notEq": "facet-id"`                     |
+| `in`       | in a set of values               | `"in": ["facet-id-1", "facet-id-2"]`      |
+| `notIn`    | not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
+| `lte`      | less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
+| `lt`       | less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
+| `gte`      | greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
+| `gt`       | greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
+
+For example, using the metadata example from the previous step, the following query could be
+constructed:
 
 ```json
 {
-  "filterItems": ["b936e2a5"],
-  "timePeriod": {
-    "startYear": 2022,
-    "startCode": "AY",
-    "endYear": 2022,
-    "endCode": "AY"
+  "query": {
+    "filters": {
+      "in": ["b936e2a5", "0d194014"]
+    },
+    "timePeriod": {
+      "gte": { "year": 202223, "code": "AY" }
+    },
+    "locations": {
+      "notIn": ["YOeoaX6K"]
+    },
+    "geographicLevel": {
+      "eq": "LocalAuthority"
+    }
   },
-  "indicators": ["772c60cd"],
-  "locations": ["6b0c3349"]
+  "indicators":  ["772c60cd"]
 }
 ```
 
 The above example would query for the number of authorised absence sessions (indicator `772c60cd`)
-matching the follow facets:
+matching the following criteria:
 
-- state-funded primary schools (filter item `b936e2a5`)
-- the North East of England (location `6b0c3349`)
-- academic year 2022/23 (time period code `AY` and year `2022`)
+- state-funded primary (filter item `b936e2a5`) or 'all' (filter item `0d194014`) school types
+- are during or after the 2022/23 academic year (time period code `AY` and year `2022`)
+- not be in the North East of England (location `YOeoaX6K`)
+- are only for local authorities (geographic level `LocalAuthority`)
 
-You can create more complex queries by adding more IDs into the respective parts of the query.
+Different facet values and comparators can be provided to tweak the query in all sorts of ways. It's
+advisable that you spend a little time getting more familiar with the query API.
+
+The [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html)
+guide explores this topic in far greater depth and is recommended for further reading.
+
+### The data set query response
 
 Once you have created your query, make the `POST` request to the endpoint. You should receive a
 response that looks like:
@@ -424,7 +462,7 @@ response that looks like:
         "school_type": "b936e2a5"
       },
       "geographicLevel": "Region",
-      "locationId": "6b0c3349",
+      "locationId": "kr60BOeG",
       "values": {
         "sess_authorised": "1708016"
       },
@@ -476,3 +514,6 @@ require you to adjust the parameters used.
 You now have all the tools to get started with the API, but we encourage you to explore the
 documentation further. It is recommended that you read the [Overview section](/overview/index.html) to
 get a better understanding of the core API features.
+
+To learn more about data set queries and how to create more complex ones, it is recommended that you
+read the guide to [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html).

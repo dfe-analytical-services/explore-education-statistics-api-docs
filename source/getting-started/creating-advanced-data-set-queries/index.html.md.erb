@@ -1,0 +1,430 @@
+---
+title: Creating advanced data set queries
+last_reviewed_on: 2022-12-06
+review_in: 6 months
+weight: 3
+---
+
+# Creating advanced data set queries
+
+The Explore education statistics (EES) API allows you to query data sets using a syntax that can
+express highly complex criteria.
+
+In this guide, you'll learn about:
+
+- basic query syntax
+- condition clauses
+- chaining conditions
+- sorting results
+
+By the end, you should have an understanding of all the possible options and how they can be combined.
+
+## What you'll need
+
+You should already be familiar with the EES API. If not, you should read the [Quick start](/getting-started/quick-start/index.html)
+first as this guide will presume some prior knowledge.
+
+To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
+tool. Good recommendations for beginners are [Postman](https://www.postman.com/)
+or [Insomnia](https://insomnia.rest/).
+
+Some prior knowledge of working with your chosen HTTP client will be necessary to work with the
+examples.
+
+## The basic query syntax
+
+Data set queries are issued by making a POST request to the [Query a data set](/endpoints/QueryDataSet/index.html)
+endpoint. At its most basic, such a request would look like the following:
+
+```
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+{
+  "query": {},
+  "indicators": []
+}
+```
+
+The request body must contain `query` and `indicators` properties. These filter the result data that
+can be in the response and must be populated using the IDs of facets from the data set metadata
+(see the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
+
+The `indicators` property controls what data values are shown in the results. This should simply
+contain a list of indicator IDs, their names or both. For example, using the following indicators:
+
+```json
+{
+  "indicators": ["id-for-indicator-1", "name-of-indicator-2"]
+}
+```
+
+Each result in the response would look like the following:
+
+```json
+{
+  "values": {
+    "name-of-indicator-1": "123",
+    "name-of-indicator-2": "245"
+  }
+}
+```
+
+Note that the values are keyed by their indicator's respective name rather than the indicator's ID.
+
+The `query` property controls what results will be in the response by filtering them based on the
+query criteria specified.
+
+At its most simple, the `query` should be composed of a **criteria object** that can contain any of
+the following facet properties:
+
+| Facet type         | Description                              | Examples                              |
+|--------------------|------------------------------------------|---------------------------------------|
+| `filters`          | IDs of filter items                      | `Yy6yonLA`                            |
+| `timePeriods`      | Time periods in `year` and `code` format | `{ "year": 202223, "code": "AY" }`    |
+| `locations`        | IDs (or codes) of locations              | `qn6OaRed`, `E08000019`               |
+| `parentLocations`  | IDs (or codes) of parent locations       | `oB6baDW8`, `E92000001`               |
+| `geographicLevels` | Geographic level codes                   | `LocalAuthority`, `Region`, `Country` |
+
+Note that `parentLocations` are locations that can contain child locations:
+
+- a country (e.g. England) contains regions
+- a region (e.g. the North West) contains local authorities, wards, etc
+- a local authority (e.g. Sheffield) contains schools, providers, etc
+
+All the facet properties are *optional*, and you can use as many (or as little) as you want to
+fulfil your query's requirements.
+
+Each property's value should be a **comparator object** that describes how the facet's values should
+be compared when filtering the results. The full list of comparators permitted is as follows:
+
+| Comparator |     | Description                      | Example                                   |
+|------------|:----|----------------------------------|-------------------------------------------|
+| `eq`       |     | Equal to a value                 | `"eq": "facet-id"`                        |
+| `notEq`    |     | Not equal to a value             | `"notEq": "facet-id"`                     |
+| `in`       |     | In a set of values               | `"in": ["facet-id-1", "facet-id-2"]`      |
+| `notIn`    |     | Not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
+| `lte`      |     | Less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
+| `lt`       |     | Less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
+| `gte`      |     | greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
+| `gt`       |     | Greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
+
+Note that facet properties may only permit certain comparators to be used. Consult
+the [schema documentation](/schemas/DataSetQueryCriteria/index.html) for each facet property to see
+if a comparator is allowed.
+
+Using all of the above information, you could write a query that looks like the following:
+
+```json
+{
+  "query": {
+    "filters": {
+      "in": ["filter-1", "filter-2"]
+    },
+    "timePeriod": {
+      "gte": { "year": 201819, "code": "AY" },
+      "lte": { "year": 202223, "code": "AY" }
+    },
+    "locations": {
+      "notIn": ["location-1", "location-2"]
+    },
+    "parentLocations": {
+      "in": ["location-3"]
+    },
+    "geographicLevel": {
+      "eq": "LocalAuthority"
+    }
+  }
+}
+```
+
+The results will be filtered so that they:
+
+- match either `filter-1` or `filter-2`
+- are between the 2018/19 and 2022/23 academic years
+- are not in `location-1` or `location-2`
+- belong to a parent location `location-3`
+- are only for local authorities
+
+It should be noted that **all parts** of the query criteria must resolve to true for a result to be
+included in the response.
+
+The above query may be suitable for simple queries, however, you may sometimes need to express
+more complex requirements. In the next section, you will explore some of the more advanced query
+syntax available.
+
+## Queries with condition clauses
+
+For more advanced queries, you can specify multiple sets of criteria that results should match.
+These sets of criteria need to be combined using condition clauses that express the relationship
+between each set.
+
+In the query syntax, a condition clause is expressed through a **condition object**. Currently,
+`and`, `or` and `not` condition objects are supported by the API.
+
+### The 'and' condition
+
+The `and` condition can be used when multiple sub-criteria **must all** be true for the overall
+condition to be true. The syntax for this looks like the following:
+
+```json
+{
+  "query": {
+    "and": [
+      {
+        "filters": {
+          "in": ["filter-1", "filter-2"]
+        }
+      },
+      {
+        "locations": {
+          "notEq": "location-1"
+        },
+        "parentLocations": {
+          "eq": "location-2"
+        }
+      },
+      {
+        "timePeriods": {
+          "gte": { "year": 201819, "code": "AY" },
+          "lte": { "year": 202223, "code": "AY" }
+        }
+      }
+    ]
+  }
+}
+```
+
+The results will be filtered so that they:
+
+- match either `filter-1` or `filter-2`
+- are not in `location-1`
+- belong to a parent location `location-2`
+- are between the 2018/19 and 2022/23 academic years
+
+At this point, you may notice that the `and` condition filters results in a similar way to a
+typical criteria object. This is indeed the case - criteria objects are essentially a shorthand
+way to write `and` conditions.
+
+The earlier example would be equivalent to the following:
+
+```json
+{
+  "query": {
+    "filters": {
+      "in": ["filter-1", "filter-2"]
+    },
+    "locations": {
+      "notEq": "location-1"
+    },
+    "parentLocations": {
+      "eq": "location-2"
+    },
+    "timePeriods": {
+      "gte": { "year": 201819, "code": "AY" },
+      "lte": { "year": 202223, "code": "AY" }
+    }
+  }
+}
+```
+
+### The 'or' condition
+
+The `or` condition can be used when there are multiple sub-criteria and **only one** must be true
+for the overall condition to be true. The syntax for this looks like the following:
+
+```json
+{
+  "query": {
+    "or": [
+      {
+        "filters": {
+          "eq": "filter-1"
+        },
+        "timePeriods": {
+          "gte": { "year": 201617, "code": "AY" },
+          "lte": { "year": 201718, "code": "AY" }
+        }
+      },
+      {
+        "filters": {
+          "eq": "filter-2"
+        },
+        "timePeriods": {
+          "gte": { "year": 202122, "code": "AY" }
+        }
+      }
+    ]
+  }
+}
+```
+
+The results will be filtered so that they:
+
+- match `filter-1` and are between the 2016/17 and 2017/18 academic years
+- or, match `filter-2` and are after the 2021/22 academic year
+
+As you can see, the `or` condition is particularly useful for expressing complex queries where
+there are multiple sets of distinct criteria. A good use-case is for matching on multiple ranges of
+time periods (like the above example).
+
+### The 'not' condition
+
+The `not` condition can be used when a condition **must not** be true, essentially negating the
+condition's result.
+
+Unlike, the `and`/`or` conditions, the `not` condition operates on a single sub-clause and the
+syntax looks like the following:
+
+```json
+{
+  "query": {
+    "not": {
+      "filters": {
+        "eq": "filter-1"
+      },
+      "timePeriods": {
+        "gt": { "year": 202122, "code": "AY" }
+      }
+    }
+  }
+}
+```
+
+The results will be filtered so that they **must not**:
+
+- match `filter-1`
+- be after the 2021/21 academic year
+
+It's not recommended to use the 'not' condition for cases where a standard criteria object would
+suffice. A criteria object can contain negated comparators such `notEq`, `notIn`, etc, and can
+typically express the same things that the 'not' condition can.
+
+## Chaining conditions
+
+In the most complex kinds of queries, you may need to chain multiple conditions together. With the
+API, it's possible to do this as the query syntax allows all condition objects to contain either
+criteria *or* condition objects.
+
+For example, a query like the following is possible:
+
+```json
+{
+  "query": {
+    "and": [
+      {
+        "filters": {
+          "eq": "filter-1"
+        }
+      },
+      {
+        "or": [
+          {
+            "timePeriods": {
+              "gte": { "year": 201617, "code": "AY" },
+              "lte": { "year": 201718, "code": "AY" }
+            }
+          },
+          {
+            "timePeriods": {
+              "gt": { "year": 202021, "code": "AY" }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The results will be filtered so that they:
+
+- match `filter-1`
+- are between the 2016/17 and 2017/18 academic years
+  - or, are after the 2020/21 academic year
+
+The `not` condition can also contain other condition objects. For example:
+
+```json
+{
+  "query": {
+    "not": {
+      "or": [
+        {
+          "filters": {
+            "eq": "filter-1"
+          },
+          "timePeriods": {
+            "gte": { "year": 201617, "code": "AY" },
+            "lte": { "year": 201718, "code": "AY" }
+          }
+        },
+        {
+          "filters": {
+            "eq": "filter-2"
+          },
+          "timePeriods": {
+            "gt": { "year": 202122, "code": "AY" }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+The results will be filtered so that they **must not**
+
+- match `filter-1` and be between the 2016/17 and 2017/18 academic years
+- or, match `filter-2` and be after the 2021/22 academic year
+
+There are no limits to how deeply condition objects can be chained and nested. You can use as many
+conditions to express your query's requirements as necessary.
+
+## Sorting results
+
+By default, query results are sorted by their time period in descending order. This means that the
+most recent results will be listed first.
+
+If you want to change the ordering of the results, you can use the query's `sort` property.
+This property should be a list of sorts that should be applied to the results, for example:
+
+```json
+{
+  "query": {...},
+  "sort": [
+    { "name": "TimePeriod", "order": "Asc" }
+  ]
+}
+```
+
+This will order results by time period in ascending order, meaning that the oldest results would
+appear first.
+
+The `name` property should be the name of the result field to sort, and the `order` controls the
+sort direction (i.e. `Asc` for ascending, `Desc` for descending).
+
+Possible options for fields that can be sorted (via the `name` property) include:
+
+- `TimePeriod`
+- geographic levels e.g. `Country`, `Region`, `LocalAuthority`, etc
+- filters e.g. `SchoolType`, `Ethnicity` etc
+
+The exact geographic level and filter name options that can be used will be found in the data set's
+metadata.
+
+You can also have multiple sorts to determine the order in tie-break situations. These will be
+applied in the order that they appear in the `sort` list. For example, given the following:
+
+```json
+{
+  "query": {...},
+  "sort": [
+    { "name": "TimePeriod", "order": "Desc" },
+    { "name": "Region", "order": "Desc" },
+    { "name": "SchoolType", "order": "Asc" }
+  ]
+}
+```
+
+The results will be ordered by time period (in descending order). Results in the same time period
+will be ordered by region (in descending order). Results in the same region will be ordered by
+school type (in ascending order).
