@@ -46,7 +46,11 @@ module ApiReferenceHelpers
     end
 
     if schema_data.additional_properties?
-      properties["<*>"] = schema_example(schema_data.additional_properties_schema)
+      properties["<*>"] = if schema_data.additional_properties_schema
+                            schema_example(schema_data.additional_properties_schema)
+                          else
+                            {}
+                          end
     end
 
     properties
@@ -76,7 +80,7 @@ module ApiReferenceHelpers
 
     if schema.type == "object"
       unless schema.name
-        if schema.additional_properties?
+        if schema.additional_properties? && schema.additional_properties_schema
           return "dictionary (#{render_schema_type(schema.additional_properties_schema)})"
         end
 
