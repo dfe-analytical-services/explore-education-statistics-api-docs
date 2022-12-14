@@ -39,12 +39,12 @@ endpoint. At its most basic, such a request would look like the following:
 ```
 POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
 {
-  "query": {},
+  "facets": {},
   "indicators": []
 }
 ```
 
-The request body must contain `query` and `indicators` properties. These filter the result data that
+The request body must contain `facets` and `indicators` properties. These filter the result data that
 can be in the response and must be populated using the IDs of facets from the data set metadata
 (see the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
 
@@ -70,10 +70,10 @@ Each result in the response would look like the following:
 
 Note that the values are keyed by their indicator's respective name rather than the indicator's ID.
 
-The `query` property controls what results will be in the response by filtering them based on the
+The `facets` property controls what results will be in the response by filtering them based on the
 query criteria specified.
 
-At its most simple, the `query` should be composed of a **criteria object** that can contain any of
+At its most simple, the `facets` should be composed of a **criteria object** that can contain any of
 the following facet properties:
 
 | Facet type         | Description                              | Examples                              |
@@ -115,7 +115,7 @@ Using all of the above information, you could write a query that looks like the 
 
 ```json
 {
-  "query": {
+  "facets": {
     "filters": {
       "in": ["filter-1", "filter-2"]
     },
@@ -167,7 +167,7 @@ condition to be true. The syntax for this looks like the following:
 
 ```json
 {
-  "query": {
+  "facets": {
     "and": [
       {
         "filters": {
@@ -208,7 +208,7 @@ The earlier example would be equivalent to the following:
 
 ```json
 {
-  "query": {
+  "facets": {
     "filters": {
       "in": ["filter-1", "filter-2"]
     },
@@ -233,7 +233,7 @@ for the overall condition to be true. The syntax for this looks like the followi
 
 ```json
 {
-  "query": {
+  "facets": {
     "or": [
       {
         "filters": {
@@ -276,7 +276,7 @@ syntax looks like the following:
 
 ```json
 {
-  "query": {
+  "facets": {
     "not": {
       "filters": {
         "eq": "filter-1"
@@ -308,7 +308,7 @@ For example, a query like the following is possible:
 
 ```json
 {
-  "query": {
+  "facets": {
     "and": [
       {
         "filters": {
@@ -345,7 +345,7 @@ The `not` condition can also contain other condition objects. For example:
 
 ```json
 {
-  "query": {
+  "facets": {
     "not": {
       "or": [
         {
@@ -389,7 +389,7 @@ This property should be a list of sorts that should be applied to the results, f
 
 ```json
 {
-  "query": {...},
+  "facets": {...},
   "sort": [
     { "name": "TimePeriod", "order": "Asc" }
   ]
@@ -416,7 +416,7 @@ applied in the order that they appear in the `sort` list. For example, given the
 
 ```json
 {
-  "query": {...},
+  "facets": {...},
   "sort": [
     { "name": "TimePeriod", "order": "Desc" },
     { "name": "Region", "order": "Desc" },

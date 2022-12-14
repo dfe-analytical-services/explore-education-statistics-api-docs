@@ -360,7 +360,7 @@ request body. The most basic request would look like the following:
 ```
 POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
 {
-  "query": {},
+  "facets": {},
   "indicators": []
 }
 ```
@@ -368,14 +368,14 @@ POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
 As seen previously, you need to substitute the `{dataSetId}` parameter with the `id` of your chosen
 data set.
 
-The request body must contain `query` and `indicators` properties. These will need to be populated
+The request body must contain `facets` and `indicators` properties. These will need to be populated
 with facet IDs so that the response can return relevant data. The possible values are found in the
 data set metadata that was retrieved in the previous step.
 
 The `indicators` property should simply contain a list of indicator IDs. The data values of the
 matching indicators will be returned as part of each result.
 
-The `query` property must be an object and can contain any of the following facet sub-properties:
+The `facets` property must be an object and can contain any of the following facet sub-properties:
 
 | Facet type         | Description                              | Examples                              |
 |--------------------|------------------------------------------|---------------------------------------|
@@ -404,7 +404,7 @@ constructed:
 
 ```json
 {
-  "query": {
+  "facets": {
     "filters": {
       "in": ["b936e2a5", "0d194014"]
     },
