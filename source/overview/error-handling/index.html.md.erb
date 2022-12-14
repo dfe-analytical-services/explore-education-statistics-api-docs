@@ -1,0 +1,172 @@
+---
+title: Error handling
+last_reviewed_on: 2022-10-05
+review_in: 6 months
+weight: 1
+---
+
+# Error handling
+
+The Explore education statistics (EES) API uses conventional HTTP status codes and response bodies to
+present errors from the API.
+
+Typically, 2xx status codes indicate a success, 4xx status codes indicate an error with the request
+itself (e.g. there were validation errors), 5xx status codes indicate an error that occurred within
+the API itself.
+
+The HTTP status codes that you can expect from the API are summarised by the following table:
+
+| Status code | Name                  | Description                                                                                                                                    |
+|-------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| 200         | OK                    | Success. The API should provide a successful response.                                                                                         |
+| 400         | Bad Request           | There were issues (e.g. validation errors) with the request meaning it could not be processed.                                                 |
+| 404         | Not Found             | The requested resource could not be found.                                                                                                     |
+| 429         | Too Many Requests     | There were too many requests made to the API in a short amount of time. Avoid making further requests, or use an appropriate backoff strategy. |
+| 500         | Internal server error | Something went wrong whilst the request was processing. This may require further assistance to resolve.                                        |
+
+## The error response body
+
+In an error occurs, the EES API will response with a body that looks like the following:
+
+```json
+{
+  "title": "There was a problem processing the request.",
+  "type": "Internal Server Error",
+  "status": 500
+}
+```
+
+The response body is modelled by the [ApiErrorViewModel](/schemas/ApiErrorViewModel/index.html) schema
+and always includes the following fields:
+
+| Property | Type   | Description                                             |
+|----------|--------|---------------------------------------------------------|
+| `title`  | string | The title of the error. Typically summarises the error. |
+| `type`   | string | The type of the error.                                  |
+| `status` | number | The HTTP status code.                                   |
+
+## Handling validation errors
+
+The API validates requests to ensure that the inputs make sense before they are processed. Issues
+can be things like:
+
+- missing parameters
+- values that are not allowed
+- values that are malformed or not formatted correctly
+
+If there are validation errors with the request, the API will respond with a body that looks like
+the following:
+
+```json
+{
+  "title": "There are validation errors with the request.",
+  "type": "Bad Request",
+  "status": 400,
+  "errors": {
+    "theField": [
+      {
+        "message": "Error message",
+        "code": "error.code"
+      }
+    ]
+  }
+}
+```
+
+This response contains the validation errors in the `errors` property. The errors are grouped by the
+respective parameter (in the request) that they relate to. In the above example, there is a single
+error relating to the request's `theField` parameter.
+
+Every validation error will at least contain a `message` property describing the specific problem to
+address.
+
+Errors will also typically contain a `code` property. These can be useful for diagnosing issues
+further, or for simply parsing errors with consuming code.
+
+Additionally, where possible, errors will contain a `details` property to provide further exact
+details about the problem. These do not have a specific structure, but may look something like:
+
+```json
+{
+  "message": "Cannot contain restricted items.",
+  "code": "notOneOf",
+  "details": {
+    "items": [25, 30]
+  }
+}
+```
+
+In the above validation error, the `details` indicates that the numbers 25 and 30 are invalid and
+cannot be used.
+
+### Global errors
+
+If a validation error relates to the request as a whole, there will no specific request parameter
+that it relates to.
+
+These types of validation errors are considered 'global' and are grouped under the `""` property.
+This looks like the following:
+
+```json
+{
+  "title": "There are validation errors with the request.",
+  "type": "Bad Request",
+  "status": 400,
+  "errors": {
+    "": [
+      {
+        "message": "A global error message",
+        "code": "global.error.code"
+      }
+    ]
+  }
+}
+```
+
+### Deeply nested parameters
+
+A validation response may also report errors relating to deeply nested parameters in the request.
+It does this by describing a path to the specific parameter using JSONPath notation, for example:
+
+
+```json
+{
+  "title": "There are validation errors with the request.",
+  "type": "Bad Request",
+  "status": 400,
+  "errors": {
+    "some.nested[1].thing": [
+      {
+        "message": "Error message",
+        "code": "error.code"
+      }
+    ]
+  }
+}
+```
+
+In the above, the error would relate to a deeply nested property of a request body that looks like
+the following:
+
+```json
+{
+  "some": {
+    "nested": [
+      { "thing": "a" },
+      { "thing": "b" }
+    ]
+  }
+}
+```
+
+The error would relate to the second item in `nested` array. For that item it would specifically
+relate to its `thing` property i.e. the value 'b'.
+
+Using the above request structure, validation errors are possible for all the following paths:
+
+- `some`
+- `some.nested`
+- `some.nested[0]`
+- `some.nested[0].thing`
+- `some.nested[1]`
+- `some.nested[1].thing`
