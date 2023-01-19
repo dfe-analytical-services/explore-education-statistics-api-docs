@@ -8,8 +8,8 @@ body <- '<%= body_json %>'
 
 response <- httr::<%= http_method.upcase %>(url<% if body_json %>,
   body=body, encode='json',
-  content_type("application/json"),
-  add_headers("Accept"= "application/json")<% end %>)
+  content_type("application/json")
+  <% end %>)
 
 output <- content(response)
 ```
