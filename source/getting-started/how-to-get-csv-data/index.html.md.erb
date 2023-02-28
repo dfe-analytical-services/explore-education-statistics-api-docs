@@ -17,18 +17,19 @@ You should already be familiar with the EES API. If not, you should read the [Qu
 first as this guide will presume some prior knowledge.
 
 To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
-tool. Good recommendations for beginners are [Postman](https://www.postman.com/)or [Insomnia](https://insomnia.rest/).
+tool. Good recommendations for beginners are [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/).
 
 Some prior knowledge of working with your chosen HTTP client will be necessary to work with the
 examples.
 
 ## Get an entire data set as a CSV file
 
-Every data set is created from an underlying CSV file that **all** the data. You may find it useful
-(or necessary) to work with the underlying CSV instead of interacting with the data set via the API.
+Every data set is created from an underlying CSV file that contains  **all** the data. You may find
+it useful (or necessary) to work with the underlying CSV instead of interacting with the data set
+via the API.
 
-The underlying CSV file can be downloaded via the [Get a data set's underlying CSV file](/endpoints/GetDataSetFile/index.html)
-endpoint. To use this endpoint, you need to make the follow `GET` request:
+The underlying CSV file can be downloaded via the [Get a data set file](/endpoints/GetDataSetFile/index.html)
+endpoint. To use this endpoint, you need to make a `GET` request:
 
 ```
 GET <%= api_url "/api/v1/data-sets/{dataSetId}/file" %>
@@ -36,15 +37,29 @@ GET <%= api_url "/api/v1/data-sets/{dataSetId}/file" %>
 
 In the request URL, you would substitute the `{dataSetId}` parameter with your chosen data set's ID.
 
-Upon making this request, a download should start. The download will contain a ZIP archive containing
-the underlying CSV file.
+Upon making this request, a download containing the CSV data should start.
 
-Data set CSV files are compressed using ZIP as they can be quite large and reach into hundreds of
-megabytes in size.
+Note that the file will be gzip compressed (like most of the API responses), meaning that your
+client will HTTP client will need to support gzip decompression to extract the contents.
+
+## Get an entire data set as a ZIP file
+
+If you would like to download the entire data set as a ZIP file (e.g. for pre-compressed for
+efficient storage), you can also use the [Get a data set file](/endpoints/GetDataSetFile/index.html)
+endpoint for this.
+
+To do this, simply change the `Accept` header in the request to `application/zip`:
+
+```
+GET <%= api_url "/api/v1/data-sets/{dataSetId}/file" %>
+Accept: application/zip
+```
+
+Note that the ZIP file will also contain other files relevant to the data set, such as its metadata.
 
 ## Get data set query results in CSV format
 
-Queries can be ran against data sets to find data matching specific criteria using the
+Queries can be run against data sets to find data matching specific criteria using the
 [Query a data set](/endpoints/QueryDataSet/index.html) endpoint. By default, this endpoint returns
 the data in JSON format, however, you can also opt to return it in CSV format.
 
