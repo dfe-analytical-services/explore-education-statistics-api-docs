@@ -336,11 +336,12 @@ filter type (e.g. school type) and will vary per data set.
 There are some other notable features in the metadata:
 
 - Facets can be grouped hierarchically via the `options` property. This can be seen in the above
-  example's locations, where the region 'North East' is in a subgroup of the country 'England'.
+  example's filters, where 'State-funded primary' is an option of 'School type'.
 - Some facets are aggregates (i.e. 'all' or 'total') of other facets within the same group.
   An aggregate facet is marked by an `isAggregate` property that is set to true. The above example
   shows an aggregate facet for 'All' school types (this would include primary, secondary, special
   schools, etc).
+- Locations are grouped by their geographic level e.g. region, country, local authority, etc.
 - Time periods are represented by a `code` and a `year`. The `code` describes the granularity of
   the time period. A full list of codes (and their descriptions) is located in the documentation
   for the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
