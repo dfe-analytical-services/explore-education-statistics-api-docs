@@ -70,6 +70,8 @@ Each result in the response would look like the following:
 
 Note that the values are keyed by their indicator's respective name rather than the indicator's ID.
 
+### Facet types
+
 The `facets` property controls what results will be in the response by filtering them based on the
 query criteria specified.
 
@@ -80,21 +82,31 @@ the following facet properties:
 |--------------------|------------------------------------------|---------------------------------------|
 | `filters`          | IDs of filter items                      | `Yy6yonLA`                            |
 | `timePeriods`      | Time periods in `year` and `code` format | `{ "year": 202223, "code": "AY" }`    |
-| `locations`        | IDs (or codes) of locations              | `qn6OaRed`, `E08000019`               |
-| `parentLocations`  | IDs (or codes) of parent locations       | `oB6baDW8`, `E92000001`               |
+| `locations`        | IDs or codes of locations                | `qn6OaRed`, `E12000001`               |
 | `geographicLevels` | Geographic level codes                   | `LocalAuthority`, `Region`, `Country` |
-
-Note that `parentLocations` are locations that can contain child locations:
-
-- a country (e.g. England) contains regions
-- a region (e.g. the North West) contains local authorities, wards, etc
-- a local authority (e.g. Sheffield) contains schools, providers, etc
 
 All the facet properties are *optional*, and you can use as many (or as little) as you want to
 fulfil your query's requirements.
 
-Each property's value should be a **comparator object** that describes how the facet's values should
-be compared when filtering the results. The full list of comparators permitted is as follows:
+#### Using IDs or codes for locations
+
+It should be noted that `locations` can accept IDs (e.g. `qn6OaRed`) and codes (e.g. `E12000001`).
+These will match locations in significantly different ways:
+
+- IDs are **exactly** matched to locations. An ID can only refer to a single location.
+- Codes are **inexactly** matched to locations. Codes can refer to any location with an
+  attribute matching one of the codes.
+
+For example, the code `E12000001` will match the region 'North East' and any location that is
+contained within it e.g. local authorities, schools, wards, etc. However, the ID of the 'North East'
+region will only match the region itself (and none of its constituent locations).
+
+### Facet comparators
+
+For each facet property in the query, its value should be a **comparator object**. This describes
+how the facet's values should be compared when filtering the results.
+
+The full list of comparators permitted is as follows:
 
 | Comparator |     | Description                      | Example                                   |
 |------------|:----|----------------------------------|-------------------------------------------|
@@ -104,7 +116,7 @@ be compared when filtering the results. The full list of comparators permitted i
 | `notIn`    |     | Not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
 | `lte`      |     | Less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
 | `lt`       |     | Less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
-| `gte`      |     | greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
+| `gte`      |     | Greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
 | `gt`       |     | Greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
 
 Note that facet properties may only permit certain comparators to be used. Consult
@@ -126,9 +138,6 @@ Using all of the above information, you could write a query that looks like the 
     "locations": {
       "notIn": ["location-1", "location-2"]
     },
-    "parentLocations": {
-      "in": ["location-3"]
-    },
     "geographicLevel": {
       "eq": "LocalAuthority"
     }
@@ -141,7 +150,6 @@ The results will be filtered so that they:
 - match either `filter-1` or `filter-2`
 - are between the 2018/19 and 2022/23 academic years
 - are not in `location-1` or `location-2`
-- belong to a parent location `location-3`
 - are only for local authorities
 
 It should be noted that **all parts** of the query criteria must resolve to true for a result to be
@@ -177,9 +185,6 @@ condition to be true. The syntax for this looks like the following:
       {
         "locations": {
           "notEq": "location-1"
-        },
-        "parentLocations": {
-          "eq": "location-2"
         }
       },
       {
@@ -197,7 +202,6 @@ The results will be filtered so that they:
 
 - match either `filter-1` or `filter-2`
 - are not in `location-1`
-- belong to a parent location `location-2`
 - are between the 2018/19 and 2022/23 academic years
 
 At this point, you may notice that the `and` condition filters results in a similar way to a
@@ -214,9 +218,6 @@ The earlier example would be equivalent to the following:
     },
     "locations": {
       "notEq": "location-1"
-    },
-    "parentLocations": {
-      "eq": "location-2"
     },
     "timePeriods": {
       "gte": { "year": 201819, "code": "AY" },

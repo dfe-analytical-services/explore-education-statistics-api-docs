@@ -280,23 +280,35 @@ The endpoint will return something that looks like the following:
     "Country": [
       {
         "id": "oB6baDW8",
-        "label": "England",
-        "level": "Country",
-        "code": "E92000001"
+        "code": "E92000001",
+        "name": "England",
+        "level": "Country"
       }
     ],
     "Region": [
       {
         "id": "YOeoaX6K",
-        "label": "North East",
+        "code": "E12000001",
+        "name": "North East",
         "level": "Region",
-        "code": "E12000001"
+        "attributes": {
+          "Country": {
+            "code": "E92000001",
+            "name": "England"
+          }
+        }
       },
       {
         "id": "kr60BOeG",
-        "label": "North West",
+        "code": "E12000002",
+        "name": "North West",
         "level": "Region",
-        "code": "E12000002"
+        "attributes": {
+          "Country": {
+            "code": "E92000001",
+            "name": "England"
+          }
+        }
       }
     ]
   },
@@ -341,7 +353,9 @@ There are some other notable features in the metadata:
   An aggregate facet is marked by an `isAggregate` property that is set to true. The above example
   shows an aggregate facet for 'All' school types (this would include primary, secondary, special
   schools, etc).
-- Locations are grouped by their geographic level e.g. region, country, local authority, etc.
+- Locations are grouped by their geographic level e.g. region, country, local authority, etc. They
+  are typically composed of multiple geographic `attributes`. For example, the region 'North West'
+  is within the country 'England'.
 - Time periods are represented by a `code` and a `year`. The `code` describes the granularity of
   the time period. A full list of codes (and their descriptions) is located in the documentation
   for the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
@@ -379,27 +393,26 @@ matching indicators will be returned as part of each result.
 
 The `facets` property must be an object and can contain any of the following facet sub-properties:
 
-| Facet type         | Description                              | Examples                              |
-|--------------------|------------------------------------------|---------------------------------------|
-| `filters`          | IDs of filter items                      | `Yy6yonLA`                            |
-| `timePeriods`      | time periods in `year` and `code` format | `{ "year": 202223, "code": "AY" }`    |
-| `locations`        | IDs (or codes) of locations              | `qn6OaRed`, `E08000019`               |
-| `parentLocations`  | IDs (or codes) of parent locations       | `oB6baDW8`, `E92000001`               |
-| `geographicLevels` | geographic level codes                   | `LocalAuthority`, `Region`, `Country` |
+| Facet type           | Description                              | Examples                              |
+|----------------------|------------------------------------------|---------------------------------------|
+| `filters`            | IDs of filter items                      | `Yy6yonLA`                            |
+| `timePeriods`        | Time periods in `year` and `code` format | `{ "year": 202223, "code": "AY" }`    |
+| `locations`          | IDs or codes of locations                | `qn6OaRed`, `E12000001`               |
+| `geographicLevels`   | Geographic level codes                   | `LocalAuthority`, `Region`, `Country` |
 
 All the facet sub-properties should be objects that describe how the respective facet values should
 be compared when filtering the results. The following comparators are typically permitted:
 
 | Comparator | Description                      | Example                                   |
 |------------|----------------------------------|-------------------------------------------|
-| `eq`       | equal to a value                 | `"eq": "facet-id"`                        |
-| `notEq`    | not equal to a value             | `"notEq": "facet-id"`                     |
-| `in`       | in a set of values               | `"in": ["facet-id-1", "facet-id-2"]`      |
-| `notIn`    | not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
-| `lte`      | less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
-| `lt`       | less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
-| `gte`      | greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
-| `gt`       | greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
+| `eq`       | Equal to a value                 | `"eq": "facet-id"`                        |
+| `notEq`    | Not equal to a value             | `"notEq": "facet-id"`                     |
+| `in`       | In a set of values               | `"in": ["facet-id-1", "facet-id-2"]`      |
+| `notIn`    | Not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
+| `lte`      | Less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
+| `lt`       | Less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
+| `gte`      | Greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
+| `gt`       | Greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
 
 For example, using the metadata example from the previous step, the following query could be
 constructed:
@@ -414,7 +427,7 @@ constructed:
       "gte": { "year": 202223, "code": "AY" }
     },
     "locations": {
-      "notIn": ["YOeoaX6K"]
+      "notIn": ["E12000001"]
     },
     "geographicLevels": {
       "eq": "LocalAuthority"
@@ -429,7 +442,7 @@ matching the following criteria:
 
 - state-funded primary (filter item `b936e2a5`) or 'all' (filter item `0d194014`) school types
 - are during or after the 2022/23 academic year (time period code `AY` and year `2022`)
-- not be in the North East of England (location `YOeoaX6K`)
+- not be in the North East of England (location code `E12000001`)
 - are only for local authorities (geographic level `LocalAuthority`)
 
 Different facet values and comparators can be provided to tweak the query in all sorts of ways. It's
