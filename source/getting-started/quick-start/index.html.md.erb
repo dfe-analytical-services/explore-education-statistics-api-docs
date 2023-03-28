@@ -403,16 +403,16 @@ The `facets` property must be an object and can contain any of the following fac
 All the facet sub-properties should be objects that describe how the respective facet values should
 be compared when filtering the results. The following comparators are typically permitted:
 
-| Comparator | Description                      | Example                                   |
-|------------|----------------------------------|-------------------------------------------|
-| `eq`       | Equal to a value                 | `"eq": "facet-id"`                        |
-| `notEq`    | Not equal to a value             | `"notEq": "facet-id"`                     |
-| `in`       | In a set of values               | `"in": ["facet-id-1", "facet-id-2"]`      |
-| `notIn`    | Not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
-| `lte`      | Less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
-| `lt`       | Less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
-| `gte`      | Greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
-| `gt`       | Greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
+| Comparator | Description                      | Multiple values? | Example                                   |
+|------------|----------------------------------|------------------|-------------------------------------------|
+| `eq`       | Equal to a value                 | No               | `"eq": "facet-id"`                        |
+| `notEq`    | Not equal to a value             | No               | `"notEq": "facet-id"`                     |
+| `in`       | In a set of values               | Yes              | `"in": ["facet-id-1", "facet-id-2"]`      |
+| `notIn`    | Not in a set of values           | Yes              | `"notIn": ["facet-id-1", "facet-id-2"]`   |
+| `lte`      | Less than or equal to a value    | No               | `"lte": { "year": 202223, "code": "AY" }` |
+| `lt`       | Less than a value                | No               | `"lt": { "year": 202223, "code": "AY" }`  |
+| `gte`      | Greater than or equal to a value | No               | `"gte": { "year": 202223, "code": "AY" }` |
+| `gt`       | Greater than a value             | No               | `"gt": { "year": 202223, "code": "AY" }`  |
 
 For example, using the metadata example from the previous step, the following query could be
 constructed:

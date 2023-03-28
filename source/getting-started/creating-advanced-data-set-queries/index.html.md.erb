@@ -108,16 +108,16 @@ how the facet's values should be compared when filtering the results.
 
 The full list of comparators permitted is as follows:
 
-| Comparator |     | Description                      | Example                                   |
-|------------|:----|----------------------------------|-------------------------------------------|
-| `eq`       |     | Equal to a value                 | `"eq": "facet-id"`                        |
-| `notEq`    |     | Not equal to a value             | `"notEq": "facet-id"`                     |
-| `in`       |     | In a set of values               | `"in": ["facet-id-1", "facet-id-2"]`      |
-| `notIn`    |     | Not in a set of values           | `"notIn": ["facet-id-1", "facet-id-2"]`   |
-| `lte`      |     | Less than or equal to a value    | `"lte": { "year": 202223, "code": "AY" }` |
-| `lt`       |     | Less than a value                | `"lt": { "year": 202223, "code": "AY" }`  |
-| `gte`      |     | Greater than or equal to a value | `"gte": { "year": 202223, "code": "AY" }` |
-| `gt`       |     | Greater than a value             | `"gt": { "year": 202223, "code": "AY" }`  |
+| Comparator | Description                      | Multiple values? | Example                                   |
+|------------|----------------------------------|------------------|-------------------------------------------|
+| `eq`       | Equal to a value                 | No               | `"eq": "facet-id"`                        |
+| `notEq`    | Not equal to a value             | No               | `"notEq": "facet-id"`                     |
+| `in`       | In a set of values               | Yes              | `"in": ["facet-id-1", "facet-id-2"]`      |
+| `notIn`    | Not in a set of values           | Yes              | `"notIn": ["facet-id-1", "facet-id-2"]`   |
+| `lte`      | Less than or equal to a value    | No               | `"lte": { "year": 202223, "code": "AY" }` |
+| `lt`       | Less than a value                | No               | `"lt": { "year": 202223, "code": "AY" }`  |
+| `gte`      | Greater than or equal to a value | No               | `"gte": { "year": 202223, "code": "AY" }` |
+| `gt`       | Greater than a value             | No               | `"gt": { "year": 202223, "code": "AY" }`  |
 
 Note that facet properties may only permit certain comparators to be used. Consult
 the [schema documentation](/schemas/DataSetQueryCriteria/index.html) for each facet property to see
