@@ -1,6 +1,6 @@
 ---
 title: How to get CSV data
-last_reviewed_on: 2022-10-06
+last_reviewed_on: 2023-04-04
 review_in: 6 months
 weight: 2
 ---
@@ -39,12 +39,12 @@ In the request URL, you would substitute the `{dataSetId}` parameter with your c
 
 Upon making this request, a download containing the CSV data should start.
 
-Note that the file will be gzip compressed (like most of the API responses), meaning that your
-client will HTTP client will need to support gzip decompression to extract the contents.
+Note that the file will be gzip compressed (like most of the API responses), meaning that your HTTP
+client will need to support gzip decompression to extract the contents.
 
 ## Get an entire data set as a ZIP file
 
-If you would like to download the entire data set as a ZIP file (e.g. for pre-compressed for
+If you would like to download the entire data set as a ZIP file (so it is pre-compressed for
 efficient storage), you can also use the [Get a data set file](/endpoints/GetDataSetFile/index.html)
 endpoint for this.
 
