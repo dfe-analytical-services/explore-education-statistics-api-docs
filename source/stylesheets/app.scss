@@ -19,3 +19,9 @@ table code  {
 .dfe-word-break--normal {
   word-break: normal !important;
 }
+
+.js-enabled {
+  .technical-documentation pre {
+    padding: govuk-spacing(7) govuk-spacing(3) govuk-spacing(3);
+  }
+}
