@@ -17,7 +17,7 @@ first as this guide will presume some prior knowledge.
 
 You should already be familiar with the basic usages of the following endpoints to proceed:
 
-- [Query a data set](/endpoints/QueryDataSet/index.html)
+- [Query a data set](/endpoints/QueryDataSetPost/index.html)
 - [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
 
 ## Diagnosing error responses
@@ -81,7 +81,7 @@ Validation errors (and error responses) are covered in much more detail in the s
 
 ## Validation errors for data set queries
 
-The [Query a data set](/endpoints/QueryDataSet/index.html) endpoint will usually try to process a
+The [Query a data set](/endpoints/QueryDataSetPost/index.html) endpoint will usually try to process a
 query as much as possible before a validation error response is sent (instead of failing early).
 Consequently, the response typically aggregates as many validation errors as possible.
 
@@ -327,9 +327,9 @@ overview.
 
 ## Debug mode
 
-To assist in debugging unexpected results for a data set query, the [Query a data set](/endpoints/QueryDataSet/index.html)
-also accepts a `debug` query parameter that enables debug mode. This can be set in the request's
-query string like so:
+To assist in debugging unexpected results for a data set query, the [Query a data set](/endpoints/QueryDataSetPost/index.html)
+endpoint also accepts a `debug` query parameter that enables debug mode. This can be set in the
+request's query string like so:
 
 ```
 <%= api_url %>/api/v1/data-sets/{dataSetId}/query?debug=true
