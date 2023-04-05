@@ -1,6 +1,6 @@
 ---
 title: Pagination
-last_reviewed_on: 2022-10-05
+last_reviewed_on: 2023-04-05
 review_in: 6 months
 weight: 2
 ---
@@ -8,10 +8,11 @@ weight: 2
 # Pagination
 
 Endpoints that return a list of results may return a paginated response. This is done for
-performance reasons to avoid excessively large responses so not all possible results can be
-returned in a single request.
+performance reasons to avoid excessively large responses that would result from returning all results
+in a single request.
 
-The list of results is split into multiple pages (or 'batches') that must be requested separately.
+When responses are paginated, the list of results is split into multiple pages (or 'batches') that
+must be requested separately.
 
 A typical paginated response looks like the following:
 
@@ -64,7 +65,7 @@ for more results. You will typically see the following:
 - `prev` links to the previous page of results
 
 The `prev` and `next` links will only be present if the respective page actually exists. This means
-that they will not be available at the pagination boundaries.
+that they will not be available at the pagination boundaries (e.g. the first and last pages).
 
 The `_links` property can be particularly useful if you wish to create a UI for navigating through
 paginated results.
@@ -86,7 +87,7 @@ Link: </the-endpoint?page=1&pageSize=500>; rel="prev",
       </the-endpoint?page=3&pageSize=500>; rel="next"
 ```
 
-These headers map directly to the metadata found under the typical `paging` property seen in an
+These headers map directly to the metadata found under the typical `paging` property seen in a
 paginated JSON responses.
 
 A notable difference here is that links are found in the `Link` header. This is outputted in a

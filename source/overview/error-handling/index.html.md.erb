@@ -1,6 +1,6 @@
 ---
 title: Error handling
-last_reviewed_on: 2022-10-05
+last_reviewed_on: 2023-04-05
 review_in: 6 months
 weight: 1
 ---
@@ -11,8 +11,8 @@ The Explore education statistics (EES) API uses conventional HTTP status codes a
 present errors from the API.
 
 Typically, 2xx status codes indicate a success, 4xx status codes indicate an error with the request
-itself (e.g. there were validation errors), 5xx status codes indicate an error that occurred within
-the API itself.
+itself (e.g. there were validation errors), and 5xx status codes indicate an error that occurred
+within the API itself.
 
 The HTTP status codes that you can typically expect from the API are summarised by the following table:
 
@@ -29,7 +29,7 @@ The HTTP status codes that you can typically expect from the API are summarised 
 
 ## The error response body
 
-In an error occurs, the EES API will response with a body that looks like the following:
+If an error occurs, the EES API will respond with a body that looks like the following:
 
 ```json
 {
@@ -149,8 +149,8 @@ It does this by describing a path to the specific parameter using JSONPath notat
 }
 ```
 
-In the above, the error would relate to a deeply nested property of a request body that looks like
-the following:
+In the above example, the error would relate to a deeply nested property of a request body that
+looks like the following:
 
 ```json
 {
@@ -163,8 +163,8 @@ the following:
 }
 ```
 
-The error would relate to the second item in `nested` array. For that item it would specifically
-relate to its `thing` property i.e. the value 'b'.
+The error would relate to the second item in the `nested` array. For that item it would specifically
+relate to its `thing` property i.e. the value `"b"`.
 
 Using the above request structure, validation errors are possible for all the following paths:
 
