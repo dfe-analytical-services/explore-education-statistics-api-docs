@@ -149,42 +149,6 @@ Alternatively, the array can be replaced with a single filter item ID string:
 It is recommended that you read the guide on [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html#facet-comparators)
 as it contains far more detail about each comparator, and how they are used with different facet types.
 
-### Missing facets
-
-Before a data set query is actually executed by the API, the facets that have been specified in the
-query are pre-validated to ensure that they exist in the data set. This is done to avoid missing
-facets causing queries to always have zero results (as they cannot be matched).
-
-When there are missing facets, a response will look like:
-
-```json
-{
-  "errors": {
-    "facets.filters.in": [
-      {
-        "message": "Could not find items.",
-        "code": "notFound",
-        "details": {
-          "items": ["invalid-filter-1", "invalid-filter-2"]
-        }
-      }
-    ]
-  }
-}
-```
-
-In these types of responses, the `notFound` error informs you about the specific items that are
-missing (e.g. `invalid-filter-1`) in the `details` property.
-
-#### Solution
-
-Ensure that all facets in the data set query actually exist in the corresponding data set metadata.
-You should check this by cross-referencing the missing facets with the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
-endpoint.
-
-Facets are not usually removed from existing data sets, so there is likely a typo (or similar) in
-the missing facets.
-
 ### Incorrect use of condition clauses
 
 Validation errors can commonly occur when writing more complex queries using condition clauses
@@ -324,6 +288,42 @@ or otherwise).
 
 The versioning policy is outlined in more detail in the [Versioning](/overview/versioning/index.html)
 overview.
+
+### Missing facets
+
+Before a data set query is executed by the API, the facets in the query are pre-validated to ensure
+that they exist in the data set. If some facets are missing, this may cause queries to have zero
+results (as they cannot be matched).
+
+When there are missing facets, a response will look like:
+
+```json
+{
+  "warnings": {
+    "facets.filters.in": [
+      {
+        "message": "Could not find items.",
+        "code": "notFound",
+        "details": {
+          "items": ["invalid-filter-1", "invalid-filter-2"]
+        }
+      }
+    ]
+  }
+}
+```
+
+In these types of responses, the `notFound` warning informs you about the specific items that are
+missing (e.g. `invalid-filter-1`) in the `details` property.
+
+#### Solution
+
+Ensure that all facets in the data set query exist in the corresponding data set metadata.
+You should check this by cross-referencing the missing facets with the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
+endpoint.
+
+Facets are not usually removed from existing data sets, so there may be a typo (or similar) in
+the missing facets.
 
 ## Debug mode
 
