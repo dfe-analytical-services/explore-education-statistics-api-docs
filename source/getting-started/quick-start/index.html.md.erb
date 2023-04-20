@@ -148,7 +148,7 @@ URL as well. The following example would search for publications matching the te
 GET <%= api_url "/api/v1/publications?search=pupil+absence" %>
 ```
 
-Like a typical URL, you can combine query parameters together with `&`. For example, you would use
+Like a typical URL, you can combine query parameters together with `&`. For example, you'd use
 the following URL to get page 2 of publications matching the term 'pupil absence':
 
 ```
@@ -168,7 +168,7 @@ endpoint:
 GET <%= api_url "/api/v1/publications/{publicationId}/data-sets" %>
 ```
 
-For this endpoint URL, you would substitute the `{publicationId}` parameter with the `id` of the
+For this endpoint URL, you'd substitute the `{publicationId}` parameter with the `id` of the
 publication you are interested in.
 
 For example, given the following publication (parts omitted for brevity):
@@ -181,7 +181,7 @@ For example, given the following publication (parts omitted for brevity):
 }
 ```
 
-You would make the following `GET` request:
+You'd make the following `GET` request:
 
 ```
 GET <%= api_url "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets" %>
@@ -224,7 +224,7 @@ will look like the following:
 
 Each data set provides high-level information about its contents. Metadata about the data set's
 geographic levels and time periods are also provided. You can use all of this information to help
-identify a data set that you would be interested in looking at further.
+identify a data set that you'd be interested in looking at further.
 
 Once you have chosen a data set, proceed to the next step.
 
@@ -259,7 +259,7 @@ your chosen data set, make the following `GET` request:
 GET <%= api_url "/api/v1/data-sets/{dataSetId}/meta" %>
 ```
 
-Again, you would substitute in the `{dataSetId}` parameter with the `id` of your chosen data set.
+Again, you'd substitute in the `{dataSetId}` parameter with the `id` of your chosen data set.
 You can also use the `meta` link from the data set's `_links` property to navigate to this directly.
 
 The endpoint will return something that looks like the following:
