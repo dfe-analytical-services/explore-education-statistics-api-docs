@@ -1,0 +1,335 @@
+---
+title: Beginner's guide to APIs
+last_reviewed_on: 2023-04-20
+review_in: 6 months
+weight: 1
+---
+
+# Beginner's guide to APIs
+
+In this guide, you'll learn the fundamentals of what an API is, how HTTP works and how to use it to
+interact with an API.
+
+An understanding of these topics is recommended before proceeding further with the Explore
+education statistics (EES) API documentation. Most of the documentation requires a basic knowledge
+of these concepts to be productive.
+
+## What are APIs?
+
+APIs (application programming interfaces) are a set of protocols and tools used to build software
+applications. Crucially, they allow different software applications to communicate with each other
+using a common language.
+
+Web APIs (like the EES API) are a way to interact with a web server (i.e. a computer hosted on the
+internet) through HTTP. Websites and mobile applications are often built using web APIs, and they
+can be used to do things like:
+
+- fetch data or other resources (e.g. images, videos) to display to end users
+- modify data stored on the server's database
+- trigger a server action e.g. schedule something
+
+## What is HTTP?
+
+HTTP stands for Hypertext Transfer Protocol, and it is used to transfer data over the web. It's
+the language that web servers and browsers most commonly use to communicate with each other.
+
+To communicate with a server using HTTP, a client (e.g. a web browser or mobile phone) must send an
+HTTP request. This contains information about the thing you're looking for or the action you
+want to perform.
+
+Once an HTTP request has been received by the server (e.g. a website or web API), it will respond
+with an HTTP response. This will contain the requested information and may specify how it should
+be consumed or displayed to the end user.
+
+## How do HTTP requests work?
+
+HTTP requests are used to send data from a client to a server. A request contains multiple
+components that provide the server with the information needed to respond correctly.
+
+The main components of a request will be discussed in more detail below.
+
+### URL (Uniform Resource Locator)
+
+A URL describes the path to a resource on the web and typically begins with `http://` or `https://`.
+When a URL is typed into a web browser, it will typically take you to that resource (e.g. a web page,
+image, audio, video, etc).
+
+### HTTP Method
+
+The HTTP method describes the type of request being made.
+
+There are many HTTP methods, however, you'll only need the following in most cases:
+
+| Method | Description                        |
+|--------|------------------------------------|
+| GET    | Used to get data                   |
+| POST   | Used to create something           |
+| PUT    | Used to create or update something |
+| PATCH  | Used to partially update something |
+| DELETE | Used to delete something           |
+
+### Query string
+
+A query string appears at the end of a URL (after a `?`) and provides additional criteria for the
+server to respond to. The following example contains a query string:
+
+```
+https://example.com/foods?category=fruit&colour=yellow
+```
+
+In the above example:
+
+- the URL is `https://example.com/foods`
+- the query string is `category=fruit&colour=yellow`
+
+The query string can be interpreted by the server as a set of parameters specifying that the
+category should be 'fruit' and the colour should be 'yellow'. Given these parameters, the server
+may respond with a list of foods matching these criteria.
+
+### Request headers
+
+These are additional pieces of information that are sent with the request. They can contain details
+about the client, or provide additional constraints on how the server should respond.
+
+Headers consist of a header name and its value, separated by a `:`. Some examples include:
+
+- the web browser or client e.g. `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ...`
+- the media type of the request body e.g. `Content-Type: application/json`
+- the accepted media types for the response body e.g. `Accept: text/html`
+- authentication credentials e.g. `Authorization: Bearer ...`
+
+### Request body
+
+In cases where a request needs to send data to the server, this can be embedded in the request's
+body. On a web browser, this is typically used by form submissions to contain the user's input.
+
+The request body is typically used with POST, PUT or PATCH methods to describe the change that
+should occur on the server.
+
+The data should be formatted and encoded in a way that the server can understand. There are
+different ways to do this, however, the most common ways are to use URL encoding or JSON.
+
+The type of data in the body should be indicated by the `Content-Type` header (see [Request headers](#request-headers)).
+
+## How do HTTP responses work?
+
+HTTP responses are used to send data from a server back to a client. A response consists of the
+following components:
+
+### Status code
+
+This is a three-digit code that indicates the status of the response. Each status code indicates
+different things e.g.
+
+- `200 OK` — the request succeeded
+- `404 Not Found` — the server could not find the requested resource
+- `500 Internal Server Error` — an error occurred whilst the server was fulfilling the request
+
+The status code will also fall into one of five groups indicating the type of response:
+
+| Range     | Description            | Examples                                               |
+|-----------|------------------------|--------------------------------------------------------|
+| 100 - 199 | Informational response | `100 Continue`                                         |
+| 200 - 299 | Successful response    | `200 OK`, `201 Created`                                |
+| 300 - 399 | Redirection response   | `301 Moved Permanently`, `302 Found`                   |
+| 400 - 499 | Client error response  | `400 Bad Request`, `404 Not Found`                     |
+| 500 - 599 | Server error response  | `500 Internal Server Error`, `503 Service Unavailable` |
+
+### Response headers
+
+Similar to request headers, a response can also contain headers. These are additional pieces of
+information, typically containing details about the server and additional context about the
+response that may be useful to the client.
+
+Some examples of response headers include:
+
+- the size of the response e.g. `Content-Length: 4123`
+- the media type of the response body e.g. `Content-Type: text/html`
+- the encoding of the response body e.g. `Content-Encoding: gzip`
+- the URL to redirect to e.g. `Location: https://another-website.com`
+
+### Response body
+
+A response will typically contain data to send back to the client in its body. The data can be
+essentially anything, but common examples include:
+
+- the HTML of a web page
+- the text of a CSV
+- the binary contents of an image, video, etc
+- the JSON data from a database
+
+The type of data in the body should be indicated by the `Content-Type` header (see [Response headers](#request-headers)).
+
+## What is JSON?
+
+JSON (JavaScript Object Notation) is a lightweight data format that is easily understood by humans.
+It is also easy for machines to parse and generate and is often used as the data format to communicate
+with web APIs (including the EES API).
+
+The following is an example of some JSON:
+
+```json
+{
+  "name": "John Smith",
+  "age": 35,
+  "isRenting": true,
+  "car": null,
+  "pets": ["cat", "dog"],
+  "address": {
+    "city": "London"
+  }
+}
+```
+
+In the above example, there is a JSON object with multiple keys such as `name` and `age`.
+Each key has an associated value and each value can be one of the following data types:
+
+- string e.g. `"John Smith"`, `"London"`, `"cat"`
+- number e.g. `35`
+- boolean e.g `true`, `false`
+- array e.g. `["cat", "dog"]`
+- object e.g. `{ "city": "London" }`
+- null
+
+Arrays are lists of other values, and objects contain key/value pairs. Typically, objects are used
+to group related values to provide some structure to the data.
+
+Both arrays and objects are compositional data types and can contain any of the other data types in
+a recursive fashion. This means that deeply nested data structures like the following are possible:
+
+```json
+{
+  "a": {
+    "b": [
+      { "c": "..." }
+    ]
+  }
+}
+```
+
+## What does communication with a web API look like?
+
+Web APIs can be structured in many ways, but the most common is to expose multiple **endpoints**
+for clients to access.
+
+An **endpoint** is the URL of a resource on the server and may look something like the following:
+
+- `https://example.com/api/foods` — endpoint for 'food' resources
+- `https://example.com/api/foods/1` — endpoint for the 'food' resource with ID = 1
+
+Clients can make requests to an endpoint using different HTTP methods (e.g. GET, POST, etc) to
+interact with it in different ways. Using the earlier endpoint examples, you can express the
+following operations:
+
+- `GET /api/foods` — list foods
+- `POST /api/foods` — create a new food
+- `GET /api/foods/1` — get the food with ID = 1
+- `PUT /api/foods/1` — update the food with ID = 1
+- `DELETE /api/foods/1` — delete the food with ID = 1
+
+The above example illustrates the typical data operations possible with web APIs. These operations
+are often described as CRUD (create, read, update, delete) operations. The EES API applies similar
+conventions for its endpoints.
+
+Depending on the endpoint and the HTTP method, the request may need some combination of a body,
+headers and query parameters.
+
+### GET example
+
+An example of a GET request would simply look like this:
+
+```
+GET https://example.com/api/foods HTTP/1.1
+```
+
+The server could respond with a list of foods in the response:
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+  {
+    "id": 1,
+    "name": "milk",
+    "category": "dairy"
+  },
+  {
+    "id": 2,
+    "name": "orange",
+    "category": "fruit"
+  }
+]
+```
+
+The response contains a `Content-Type` header to inform the client about the media type of the
+response body. In this case, it is set to `application/json` meaning that the response body
+contains JSON data.
+
+### POST example
+
+An example of a POST request would look like:
+
+```
+POST https://example.com/api/foods HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "lemon",
+  "category": "fruit"
+}
+```
+
+This would create a new food with a `name` of 'lemon' and `category` of 'fruit'.
+
+The request contains a `Content-Type` header to inform the server about the media type of the request
+body. In this case, it is set to `application/json` meaning that the response body contains JSON data.
+
+The server could then respond with a successful response indicating the food was created:
+
+```
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{
+  "id": 3,
+  "name": "lemon",
+  "category": "fruit"
+}
+```
+
+In this response, the status code is `201 Created` and the response body contains the created food.
+
+## How to send requests to web APIs
+
+The recommended way to send requests to a web API is to use either an HTTP or API client tool.
+Some good tools for beginners are [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/).
+
+HTTP and API client tools allow you to directly manipulate HTTP requests and all their constituent
+components. This flexibility is needed to construct the different kinds of requests needed to use a
+web API.
+
+Most API client tools will also re-format responses to make them more human-readable. Web APIs
+will typically output their responses in the most compact form possible as they are intended to be
+machine-readable by default.
+
+Web browsers can also be used to make requests to web API endpoints, however, this comes with the
+caveat that only simple GET requests (using just the URL) are possible. Additionally, web browsers
+will not display HTTP responses in a human-readable way by default.
+
+## Conclusion
+
+Web APIs provide the core building blocks for creating websites and other applications on the modern
+web. Understanding HTTP provides foundational knowledge that will allow you to effectively work with
+web APIs.
+
+The EES API is a web API and having knowledge of all the discussed topics will provide you most of
+the tools to become productive with the documentation.
+
+Once you feel ready to proceed with the rest of the documentation, it is recommended that you read
+the [Quick start guide](/getting-started/quick-start/index.html) to get familiar with how the
+EES API works.
+
+### Further reading
+
+1. [Basics of HTTP - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP)
