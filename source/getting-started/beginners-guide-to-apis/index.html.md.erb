@@ -7,26 +7,12 @@ weight: 1
 
 # Beginner's guide to APIs
 
-In this guide, you'll learn the fundamentals of what an API is, how HTTP works and how to use it to
-interact with an API.
+In this guide, you'll learn the fundamentals of what HTTP is, what an API is, and how you can use
+HTTP to interact with web APIs.
 
 An understanding of these topics is recommended before proceeding further with the Explore
 education statistics (EES) API documentation. Most of the documentation requires a basic knowledge
 of these concepts to be productive.
-
-## What are APIs?
-
-APIs (application programming interfaces) are a set of protocols and tools used to build software
-applications. Crucially, they allow different software applications to communicate with each other
-using a common language.
-
-Web APIs (like the EES API) are a way to interact with a web server (i.e. a computer hosted on the
-internet) through HTTP. Websites and mobile applications are often built using web APIs, and they
-can be used to do things like:
-
-- fetch data or other resources (e.g. images, videos) to display to end users
-- modify data stored on the server's database
-- trigger a server action e.g. schedule something
 
 ## What is HTTP?
 
@@ -41,32 +27,77 @@ Once an HTTP request has been received by the server (e.g. a website or web API)
 with an HTTP response. This will contain the requested information and may specify how it should
 be consumed or displayed to the end user.
 
+## What are APIs?
+
+APIs (application programming interfaces) are a set of protocols and rules used to build software
+applications. Crucially, they allow different software applications to communicate with each other
+using a common language.
+
+Web APIs, like the EES API, are servers (i.e. a computer hosted on the internet) that use HTTP to
+communicate. Clients can send requests to web APIs to get them to do things like:
+
+- fetch or modify data stored in a database
+- download or upload asset files (e.g. images, videos, documents)
+- communicate with other APIs
+
+<%= tag :img,
+    :src => "/images/web-api-diagram.png",
+    :alt => "Diagram illustrating HTTP request/response between a client and web API, which may then communicate with a database, file store or other APIs" %>
+
+Websites and mobile applications are often built using web APIs to provide the data and assets that
+will be displayed to the end user.
+
+## How to send requests to web APIs
+
+The recommended way to send requests to a web API is to use either an HTTP or API client tool.
+Some good tools for beginners are [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/).
+
+HTTP and API client tools allow you to directly manipulate HTTP requests and all their constituent
+components. This flexibility is needed to construct the different kinds of requests needed to use a
+web API.
+
+Most API client tools will also re-format responses to make them more human-readable. Web APIs
+will typically output their responses in the most compact form possible as they are intended to be
+machine-readable by default.
+
+Web browsers can also be used to make requests to web API endpoints, however, this comes with the
+caveat that only simple GET requests (using just the URL) are possible. Additionally, web browsers
+will not display HTTP responses in a human-readable way by default.
+
 ## How do HTTP requests work?
 
-HTTP requests are used to send data from a client to a server. A request contains multiple
+HTTP requests are used by a client to request something from a server. A request contains multiple
 components that provide the server with the information needed to respond correctly.
 
 The main components of a request will be discussed in more detail below.
 
 ### URL (Uniform Resource Locator)
 
-A URL describes the path to a resource on the web and typically begins with `http://` or `https://`.
-When a URL is typed into a web browser, it will typically take you to that resource (e.g. a web page,
-image, audio, video, etc).
+A URL describes the path to a **resource** on the web and typically begins with `http://` or `https://`.
+When a URL is typed into a web browser, it will typically take you to that resource.
+
+Examples of resources include things like:
+
+- web pages on a website
+- data from a web API
+- files (images, audio, videos, etc)
 
 ### HTTP Method
 
-The HTTP method describes the type of request being made.
+The HTTP method describes the type of request being made. There are many HTTP methods, however,
+you'll typically only need GET, POST, PUT, PATCH and DELETE.
 
-There are many HTTP methods, however, you'll only need the following in most cases:
+The method is normally used to get the server to do different things, however, the server interpret
+these differently depending on the use-case. Many servers adhere to some common conventions for
+how methods should be used and interpreted:
 
-| Method | Description                        |
-|--------|------------------------------------|
-| GET    | Used to get data                   |
-| POST   | Used to create something           |
-| PUT    | Used to create or update something |
-| PATCH  | Used to partially update something |
-| DELETE | Used to delete something           |
+| Method | Sends data? | Changes server state? | Conventional usage                            |
+|--------|-------------|-----------------------|-----------------------------------------------|
+| GET    | No          | No                    | Get a resource                                |
+| POST   | Yes         | Yes                   | Send some data to create a resource           |
+| PUT    | Yes         | Yes                   | Send some data to create or update a resource |
+| PATCH  | Yes         | Yes                   | Send some data to update a resource           |
+| DELETE | No          | Yes                   | Delete a resource                             |
 
 ### Query string
 
@@ -158,7 +189,7 @@ essentially anything, but common examples include:
 - the binary contents of an image, video, etc
 - the JSON data from a database
 
-The type of data in the body should be indicated by the `Content-Type` header (see [Response headers](#request-headers)).
+The type of data in the body should be indicated by the `Content-Type` header (see [Response headers](#response-headers)).
 
 ## What is JSON?
 
@@ -191,11 +222,14 @@ Each key has an associated value and each value can be one of the following data
 - object e.g. `{ "city": "London" }`
 - null
 
-Arrays are lists of other values, and objects contain key/value pairs. Typically, objects are used
-to group related values to provide some structure to the data.
+Arrays are lists of values that are normally used to describe multiple things that have an order.
 
-Both arrays and objects are compositional data types and can contain any of the other data types in
-a recursive fashion. This means that deeply nested data structures like the following are possible:
+Objects are made up of multiple key/value pairs. They are typically used to group related values in
+the data, for example, an object could represent an address by containing the address lines, city,
+postcode, etc.
+
+Both arrays and objects are compositional data types and can contain any of the data types within
+themselves. This means that deeply nested data structures like the following are possible:
 
 ```json
 {
@@ -299,23 +333,6 @@ Content-Type: application/json
 ```
 
 In this response, the status code is `201 Created` and the response body contains the created food.
-
-## How to send requests to web APIs
-
-The recommended way to send requests to a web API is to use either an HTTP or API client tool.
-Some good tools for beginners are [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/).
-
-HTTP and API client tools allow you to directly manipulate HTTP requests and all their constituent
-components. This flexibility is needed to construct the different kinds of requests needed to use a
-web API.
-
-Most API client tools will also re-format responses to make them more human-readable. Web APIs
-will typically output their responses in the most compact form possible as they are intended to be
-machine-readable by default.
-
-Web browsers can also be used to make requests to web API endpoints, however, this comes with the
-caveat that only simple GET requests (using just the URL) are possible. Additionally, web browsers
-will not display HTTP responses in a human-readable way by default.
 
 ## Conclusion
 
