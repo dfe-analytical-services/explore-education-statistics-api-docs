@@ -16,12 +16,13 @@ table code  {
   line-height: 1 !important;
 }
 
-.dfe-word-break--normal {
-  word-break: normal !important;
-}
-
 .js-enabled {
   .technical-documentation pre {
     padding: govuk-spacing(7) govuk-spacing(3) govuk-spacing(3);
+
+    &:focus {
+      border:  1px solid govuk-colour('black');
+      box-shadow: inset 0 0 0 2px govuk-colour('black');
+    }
   }
 }
