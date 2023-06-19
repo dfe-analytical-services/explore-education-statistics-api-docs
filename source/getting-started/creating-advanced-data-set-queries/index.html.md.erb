@@ -1,6 +1,6 @@
 ---
 title: Creating advanced data set queries
-last_reviewed_on: 2022-12-06
+last_reviewed_on: 2023-06-19
 review_in: 6 months
 weight: 3
 ---
@@ -93,13 +93,12 @@ fulfil your query's requirements.
 It should be noted that `locations` can accept IDs (e.g. `qn6OaRed`) and codes (e.g. `E12000001`).
 These will match locations in significantly different ways:
 
-- IDs are **exactly** matched to locations. An ID can only refer to a single location.
-- Codes are **inexactly** matched to locations. Codes can refer to any location with an
-  attribute matching one of the codes.
+- an ID will only refer to a **single** location
+- a code may refer to **multiple** locations
 
-For example, the code `E12000001` will match the region 'North East' and any location that is
-contained within it e.g. local authorities, schools, wards, etc. However, the ID of the 'North East'
-region will only match the region itself (and none of its constituent locations).
+Location codes are typically unique, but the same code may be used across multiple locations.
+This may produce unexpected results, so it is recommended to use IDs where possible to only get the
+precise locations you are interested in.
 
 ### Facet comparators
 

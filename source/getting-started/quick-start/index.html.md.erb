@@ -1,6 +1,6 @@
 ---
 title: Quick start
-last_reviewed_on: 2023-04-20
+last_reviewed_on: 2023-06-19
 review_in: 6 months
 weight: 2
 ---
@@ -276,42 +276,37 @@ The endpoint will return something that looks like the following:
       "decimalPlaces": 0
     }
   ],
-  "locations": {
-    "Country": [
-      {
-        "id": "oB6baDW8",
-        "code": "E92000001",
-        "name": "England",
-        "level": "Country"
-      }
-    ],
-    "Region": [
-      {
-        "id": "YOeoaX6K",
-        "code": "E12000001",
-        "name": "North East",
-        "level": "Region",
-        "attributes": {
-          "Country": {
-            "code": "E92000001",
-            "name": "England"
-          }
+  "geographicLevels": [
+    "Country",
+    "Region"
+  ],
+  "locations": [
+    {
+      "level": "Country",
+      "options": [
+        {
+          "id": "oB6baDW8",
+          "code": "E92000001",
+          "name": "England"
         }
-      },
-      {
-        "id": "kr60BOeG",
-        "code": "E12000002",
-        "name": "North West",
-        "level": "Region",
-        "attributes": {
-          "Country": {
-            "code": "E92000001",
-            "name": "England"
-          }
+      ]
+    },
+    {
+      "level": "Region",
+      "options": [
+        {
+          "id": "YOeoaX6K",
+          "code": "E12000001",
+          "name": "North East"
+        },
+        {
+          "id": "kr60BOeG",
+          "code": "E12000002",
+          "name": "North West"
         }
-      }
-    ]
-  },
+      ]
+    }
+  ],
   "timePeriods": [
     {
       "code": "AY",
@@ -339,23 +334,28 @@ The endpoint will return something that looks like the following:
 }
 ```
 
-Time periods and locations are mandatory facets and can be found at the top-level of the response
-under `timePeriods` and `locations`. These will always appear in the metadata.
+Indicators can be found under the `indicators` key. Each indicator will at least have a unique `id`,
+a human-readable `label` and a `name` used in the underlying data file.
 
-Non-core facets are optional and can be found under the `filters` key. These are grouped by their
-filter type (e.g. school type) and will vary per data set.
+The core facets are found under the `timePeriods`, `geographicLevels` and `locations` keys, whilst
+non-core facets are found under the `filters` key. These are grouped by their filter type
+(e.g. school type) and will vary per data set.
 
-There are some other notable features in the metadata:
+There are some other notable features of the metadata:
 
-- Facets can be grouped hierarchically via the `options` property. This can be seen in the above
-  example's filters, where 'State-funded primary' is an option of 'School type'.
+- Indicators may contain a `unit` specifying the mathematical unit that was used in the measurement,
+  and `decimalPlaces` that specify the recommended number of decimal places to use to display the
+  indicator value.
+- Facets are grouped under the `options` property of a filter type. This can be seen in the above
+  example where 'State-funded primary' is a facet option of the 'School type' filter.
 - Some facets are aggregates (i.e. 'all' or 'total') of other facets within the same group.
   An aggregate facet is marked by an `isAggregate` property that is set to true. The above example
   shows an aggregate facet for 'All' school types (this would include primary, secondary, special
   schools, etc).
 - Locations are grouped by their geographic level e.g. region, country, local authority, etc. They
-  are typically composed of multiple geographic `attributes`. For example, the region 'North West'
-  is within the country 'England'.
+  typically have both an `id` and `code`, which can both be used as identifiers.
+- Geographic levels identifiers must be from a set of specific identifiers - see the
+  [GeographicLevel schema](/schemas/GeographicLevel/index.html) for the full set.
 - Time periods are represented by a `code` and a `year`. The `code` describes the granularity of
   the time period. A full list of codes (and their descriptions) is located in the documentation
   for the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
@@ -472,12 +472,14 @@ response that looks like:
   },
   "results": [
     {
-      "id": "625b36de",
       "filters": {
         "school_type": "b936e2a5"
       },
       "geographicLevel": "Region",
-      "locationId": "kr60BOeG",
+      "locations": {
+        "Country": "oB6baDW8",
+        "Region": "kr60BOeG"
+      },
       "values": {
         "sess_authorised": "1708016"
       },

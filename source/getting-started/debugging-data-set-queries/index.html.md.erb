@@ -349,7 +349,11 @@ The response will then be modified to return results that look like the followin
     "year": 202122
   },
   "geographicLevel": "LocalAuthority",
-  "locationId": "gM6LArwJ :: England (E92000001), East Midlands (E12000004), Derby (E06000015)",
+  "locations": {
+    "Country": "gM6LArwJ :: England :: E92000001",
+    "Region": "lV6qPWr7 :: East Midlands :: E12000004",
+    "LocalAuthority": "qn6OaRed :: Derby :: E06000015"
+  },
   "values": {
     "headcount": "79",
     "percent_of_pupils": "0.429161234"
@@ -357,7 +361,7 @@ The response will then be modified to return results that look like the followin
 }
 ```
 
-As you can see from the above, the values of `filters` and `locationId` now contain human-readable
+As you can see from the above, the values of `filters` and `locations` now contain human-readable
 labels and the facet ID in the format:
 
 ```
