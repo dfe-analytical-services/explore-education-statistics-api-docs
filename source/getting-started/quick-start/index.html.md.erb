@@ -1,6 +1,6 @@
 ---
 title: Quick start
-last_reviewed_on: 2023-06-19
+last_reviewed_on: 2023-12-08
 review_in: 6 months
 weight: 2
 ---
@@ -99,16 +99,18 @@ This endpoint will respond with something like the following (parts have been om
   "results" : [
     {
       "_links" : {
-        "dataSets" : {
-          "href" : "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets"
-        },
         "self" : {
           "href" : "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad"
+        },
+        "dataSets" : {
+          "href" : "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets"
         }
       },
       "id" : "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
       "slug" : "Pupil-absence-in-schools-in-England",
-      "title" : "Pupil absence in schools in England"
+      "title" : "Pupil absence in schools in England",
+      "summary": "Pupil absence, including overall, authorised and unauthorised absence...",
+      "lastPublished": "2023-11-10T09:15:00+00:00"
     }
   ]
 }
@@ -177,7 +179,9 @@ For example, given the following publication (parts omitted for brevity):
 {
   "id" : "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
   "slug" : "Pupil-absence-in-schools-in-England",
-  "title" : "Pupil absence in schools in England"
+  "title" : "Pupil absence in schools in England",
+  "summary": "Pupil absence, including overall, authorised and unauthorised absence...",
+  "lastPublished": "2023-11-10T09:15:00+00:00"
 }
 ```
 
@@ -269,9 +273,8 @@ The endpoint will return something that looks like the following:
   "totalResults": 1000,
   "indicators": [
     {
-      "id": "772c60cd",
+      "id": "sess_authorised",
       "label": "Number of authorised absence sessions",
-      "name": "sess_authorised",
       "unit": "",
       "decimalPlaces": 0
     }
@@ -316,8 +319,8 @@ The endpoint will return something that looks like the following:
   ],
   "filters": [
     {
+      "id": "school_type",
       "label": "School type",
-      "name": "school_type",
       "options": [
         {
           "id": "0d194014",
@@ -335,7 +338,7 @@ The endpoint will return something that looks like the following:
 ```
 
 Indicators can be found under the `indicators` key. Each indicator will at least have a unique `id`,
-a human-readable `label` and a `name` used in the underlying data file.
+and a more human-readable `label`.
 
 The core facets are found under the `timePeriods`, `geographicLevels` and `locations` keys, whilst
 non-core facets are found under the `filters` key. These are grouped by their filter type
@@ -495,7 +498,7 @@ response that looks like:
 The `results` part of this response contains a list where each item is a facet combination and the
 data matching it. The data itself can be found in each result's `values` property.
 
-The `values` property of each result is a dictionary where the key is the name of the indicator
+The `values` property of each result is a dictionary where the key is the ID of the indicator
 and the value is the data collected. In the above example, the number of authorised absence sessions
 (`sess_authorised`) is 1708016.
 

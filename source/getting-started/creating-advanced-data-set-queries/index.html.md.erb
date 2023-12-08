@@ -1,6 +1,6 @@
 ---
 title: Creating advanced data set queries
-last_reviewed_on: 2023-06-19
+last_reviewed_on: 2023-12-08
 review_in: 6 months
 weight: 3
 ---
@@ -49,7 +49,7 @@ can be in the response and must be populated using the IDs of facets from the da
 (see the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
 
 The `indicators` property controls what data values are shown in the results. This should simply
-contain a list of indicator IDs, their names or both. For example, using the following indicators:
+contain a list of indicator IDs. For example, using the following indicators:
 
 ```json
 {
@@ -62,8 +62,8 @@ Each result in the response would look like the following:
 ```json
 {
   "values": {
-    "name-of-indicator-1": "123",
-    "name-of-indicator-2": "245"
+    "id-of-indicator-1": "123",
+    "id-of-indicator-2": "245"
   }
 }
 ```
