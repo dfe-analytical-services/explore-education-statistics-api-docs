@@ -5,11 +5,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  daniel_the_manual_spaniel:
+  slack-notification:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -19,4 +19,5 @@ jobs:
         run: bundle exec rake notify:expired
         env:
           REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || 0 }}
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          OVERRIDE_SLACK_MESSAGE_PREFIX: "Please ensure that the Public API documentation is up to date."
