@@ -30,7 +30,7 @@ module ApiReferenceHelpers
                      schema_example(schema)
                    when "array"
                      if schema.items && schema.items != schema_data
-                       unless schema.items.one_of.nil?
+                       if schema.items.one_of
                          schema.items.one_of
                                .reject { |item| references.include?(item) }
                                .map { |item| schema_example(item, references + [item]) }
@@ -39,6 +39,12 @@ module ApiReferenceHelpers
                        end
                      else
                        []
+                     end
+                   when nil
+                     if schema.all_of&.any?
+                       schema_example(schema)
+                     else
+                       {}
                      end
                    else
                      Utils::primitive_schema_example(schema)
@@ -109,7 +115,7 @@ module ApiReferenceHelpers
         "array (#{render_schema_type(items)})"
       end
     else
-      schema.type || ""
+      schema.type || "any"
     end
   end
 
