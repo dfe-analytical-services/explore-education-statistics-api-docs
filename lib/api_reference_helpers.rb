@@ -16,7 +16,7 @@ module ApiReferenceHelpers
       return items ? [schema_example(items)] : []
     end
 
-    if schema_data.one_of
+    if schema_data.one_of&.any?
       return schema_example(schema_data.one_of[0])
     end
 
@@ -77,7 +77,7 @@ module ApiReferenceHelpers
   # @param [Openapi3Parser::Node::Schema] schema
   # @return [String]
   def render_schema_type(schema)
-    unless schema.one_of.nil?
+    if schema.one_of&.any?
       schemas = schema.one_of.map { |s| "<li>#{render_schema_type(s)}</li>" }
                       .join
 
@@ -115,6 +115,12 @@ module ApiReferenceHelpers
         "array (#{render_schema_type(items)})"
       end
     else
+      # Make assumption that all oneOf items are same type as
+      # Swashbuckle theoretically shouldn't allow different types.
+      if schema.all_of&.any?
+        return render_schema_type(schema.all_of[0])
+      end
+
       schema.type || "any"
     end
   end
