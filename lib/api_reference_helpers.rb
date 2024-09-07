@@ -105,23 +105,23 @@ module ApiReferenceHelpers
         return "array"
       end
 
-      if items.type == "object" && items.name
-        href = ::Middleman::Util::url_for(@app, "/schemas/#{items.name}/index.html", {
+      "array (#{render_schema_type(items)})"
+    else
+      if schema.name
+        href = ::Middleman::Util::url_for(@app, "/schemas/#{schema.name}/index.html", {
           current_resource: current_resource
         })
 
-        "array (<a href='#{href}'>#{items.name}</a>)"
+        "<a href='#{href}'>#{schema.name}</a>"
       else
-        "array (#{render_schema_type(items)})"
-      end
-    else
-      # Make assumption that all oneOf items are same type as
-      # Swashbuckle theoretically shouldn't allow different types.
-      if schema.all_of&.any?
-        return render_schema_type(schema.all_of[0])
-      end
+        # Make assumption that all oneOf items are same type as
+        # Swashbuckle theoretically shouldn't allow different types.
+        if schema.all_of&.any?
+          return render_schema_type(schema.all_of[0])
+        end
 
-      schema.type || "any"
+        schema.type || "any"
+      end
     end
   end
 
