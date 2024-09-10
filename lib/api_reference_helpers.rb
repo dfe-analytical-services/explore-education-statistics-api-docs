@@ -7,6 +7,10 @@ module ApiReferenceHelpers
       return schema_data.example
     end
 
+    if schema_data.default
+      return schema_data.default
+    end
+
     if Utils::is_primitive_schema(schema_data)
       return Utils::primitive_schema_example(schema_data)
     end
@@ -122,6 +126,14 @@ module ApiReferenceHelpers
     # @param [Openapi3Parser::Node::Schema] schema
     # @return [String, Number, Boolean]
     def self.primitive_schema_example(schema)
+      if schema.example
+        return schema.example
+      end
+
+      if schema.default
+        return schema.default
+      end
+
       case schema.type
       when "string"
         schema.format ? "string(#{schema.format})" : "string"
