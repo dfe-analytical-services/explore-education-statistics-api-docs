@@ -13,42 +13,35 @@ module ApiReferenceHelpers
 
     if schema_data.type == "array"
       items = schema_data.items
-      return items ? [schema_example(items)] : []
+
+      if items && items != schema_data
+        if items.one_of&.any?
+          return items
+                   .one_of
+                   .reject { |schema| references.include?(schema) }
+                   # Add schema to references to avoid infinite recursion
+                   .map { |schema| schema_example(schema, references + [schema]) }
+        else
+          return [schema_example(items)]
+        end
+      else
+        return items ? [schema_example(items)] : []
+      end
     end
 
     if schema_data.one_of&.any?
-      return schema_example(schema_data.one_of[0])
-    end
+      schemas = schema_data
+                  .one_of
+                  .reject { |schema| references.include?(schema) }
 
-    # TODO - Implement other complex schemas anyOf, not, etc
+      # Add schema to references to avoid infinite recursion
+      return schema_example(schemas[0], references + [schema_data])
+    end
 
     properties = get_schema_properties(schema_data)
 
     properties = properties.each_with_object({}) do |(name, schema), memo|
-      memo[name] = case schema.type
-                   when "object"
-                     schema_example(schema)
-                   when "array"
-                     if schema.items && schema.items != schema_data
-                       if schema.items.one_of
-                         schema.items.one_of
-                               .reject { |item| references.include?(item) }
-                               .map { |item| schema_example(item, references + [item]) }
-                       else
-                         [schema_example(schema.items)]
-                       end
-                     else
-                       []
-                     end
-                   when nil
-                     if schema.all_of&.any?
-                       schema_example(schema)
-                     else
-                       {}
-                     end
-                   else
-                     Utils::primitive_schema_example(schema)
-                   end
+      memo[name] = schema_example(schema, references + [schema])
     end
 
     if schema_data.additional_properties?
