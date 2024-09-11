@@ -1,6 +1,8 @@
 <%= description %>
 
-<% if schema.enum %>
+<% is_referenced_schema = schema.node_context.document_location != schema.node_context.source_location %>
+
+<% if !is_referenced_schema && schema.enum %>
 Available options:
 
 <% schema.enum.each do |item| %>
