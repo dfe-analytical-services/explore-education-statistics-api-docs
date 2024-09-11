@@ -122,6 +122,23 @@ module ApiReferenceHelpers
     end
   end
 
+  # @param [Openapi3Parser::Node::Schema] schema
+  # @param [Openapi3Parser::Node::Schema, String] property
+  # @return [Boolean]
+  def is_required_schema_property?(schema, property)
+    if schema.requires?(property)
+      return true
+    end
+
+    if schema.all_of&.any?
+      return schema.all_of.to_a.reduce(false) do |_, all_of_schema|
+        all_of_schema.requires?(property)
+      end
+    end
+
+    false
+  end
+
   class Utils
     # @param [Openapi3Parser::Node::Schema] schema
     # @return [String, Number, Boolean]

@@ -31,7 +31,7 @@ Available options:
     <tr>
       <td><code class="dfe-word-break--normal"><%= name %></code></td>
       <td><%= render_schema_type(property) %></td>
-      <td><%= schema.requires?(property) %></td>
+      <td><%= is_required_schema_property?(schema, property) %></td>
       <td>
         <%= partial("partials/schema_description", :locals => {
           description: property.description,
