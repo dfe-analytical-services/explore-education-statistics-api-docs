@@ -44,7 +44,7 @@ Available options:
 </table>
 <% end %>
 
-<% if schema.type == "object" || schema.type == "array" %>
+<% unless is_primitive_schema(schema) %>
 ## Example schema
 
 <% schema_json = json_pretty(schema_example(schema)) %>

@@ -11,7 +11,7 @@ module ApiReferenceHelpers
       return schema_data.default
     end
 
-    if Utils::is_primitive_schema(schema_data)
+    if is_primitive_schema(schema_data)
       return Utils::primitive_schema_example(schema_data)
     end
 
@@ -139,6 +139,18 @@ module ApiReferenceHelpers
     false
   end
 
+  # @param [Openapi3Parser::Node::Schema] schema
+  # @return [Boolean]
+  def is_complex_schema(schema)
+    !!(schema.all_of || schema.any_of || schema.one_of || schema.not)
+  end
+
+  # @param [Openapi3Parser::Node::Schema] schema
+  # @return [Boolean]
+  def is_primitive_schema(schema)
+    !is_complex_schema(schema) && !schema.type.nil? && schema.type != "object" && schema.type != "array"
+  end
+
   class Utils
     # @param [Openapi3Parser::Node::Schema] schema
     # @return [String, Number, Boolean]
@@ -161,18 +173,6 @@ module ApiReferenceHelpers
       else
         raise "Invalid primitive schema type: #{schema.type}"
       end
-    end
-
-    # @param [Openapi3Parser::Node::Schema] schema
-    # @return [Boolean]
-    def self.is_complex_schema(schema)
-      !!(schema.all_of || schema.any_of || schema.one_of || schema.not)
-    end
-
-    # @param [Openapi3Parser::Node::Schema] schema
-    # @return [Boolean]
-    def self.is_primitive_schema(schema)
-      !is_complex_schema(schema) && !schema.type.nil? && schema.type != "object" && schema.type != "array"
     end
   end
 end
