@@ -1,30 +1,35 @@
 <%= description %>
 
-<% is_referenced_schema = schema.node_context.document_location != schema.node_context.source_location %>
+<% if schema.default %>
+Defaults to: `<%= schema.default %>`
+<% end %>
 
-<% if !is_referenced_schema && schema.enum %>
-Available options:
+<% if has_schema_validations(schema) %>
+Validation constraints:
+
+<%= partial("partials/schema_validations", :locals => { schema: schema }) %>
+<% end %>
+
+<% if !is_referenced_schema(schema) && schema.enum %>
+Allowed options:
 
 <% schema.enum.each do |item| %>
 - `<%= item %>`
 <% end %>
 <% end %>
 
-<%# TODO: Add other validation rules  %>
-<% unless schema.minimum.nil? && schema.maximum.nil? && schema.format.nil? %>
-<% if schema.minimum %>
-- <%= schema.exclusive_minimum? ? 'Minimum (exclusive)' : 'Minimum' %>: `<%= schema.minimum %>`
+<% if schema.type == "array" && schema.items != nil %>
+<% if has_schema_validations(schema.items) %>
+Validation constraints for child items:
+
+<%= partial("partials/schema_validations", :locals => { schema: schema.items }) %>
 <% end %>
 
-<% if schema.maximum %>
-- <%= schema.exclusive_maximum? ? 'Maximum (exclusive)' : 'Maximum' %>: `<%= schema.maximum %>`
-<% end %>
+<% if !is_referenced_schema(schema.items) && schema.items.enum %>
+Allowed options for child items:
 
-<% if schema.format %>
-- Format: `<%= schema.format %>`
+<% schema.items.enum.each do |item| %>
+- `<%= item %>`
 <% end %>
 <% end %>
-
-<% if schema.default %>
-Defaults to: `<%= schema.default %>`
 <% end %>

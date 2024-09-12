@@ -42,6 +42,11 @@ module ApiReferenceHelpers
       return schema_example(schemas[0], references + [schema_data])
     end
 
+    # Is extending a referenced another schema using allOf
+    if schema_data.type.nil? && schema_data.all_of&.count == 1
+      return schema_example(schema_data.all_of[0])
+    end
+
     properties = get_schema_properties(schema_data)
 
     properties = properties.each_with_object({}) do |(name, schema), memo|
@@ -139,6 +144,17 @@ module ApiReferenceHelpers
     false
   end
 
+  # Return true if the schema is a reference (i.e. a $ref).
+  #
+  # The OpenAPI parser automatically resolves references for us, but we sometimes
+  # need to know if the schema was originally a reference.
+  #
+  # @param [Openapi3Parser::Node::Schema] schema
+  # @return [Boolean]
+  def is_referenced_schema(schema)
+    schema.node_context.document_location != schema.node_context.source_location
+  end
+
   # @param [Openapi3Parser::Node::Schema] schema
   # @return [Boolean]
   def is_complex_schema(schema)
@@ -149,6 +165,19 @@ module ApiReferenceHelpers
   # @return [Boolean]
   def is_primitive_schema(schema)
     !is_complex_schema(schema) && !schema.type.nil? && schema.type != "object" && schema.type != "array"
+  end
+
+  # @return [Boolean]
+  def has_schema_validations(schema)
+      schema.min_length != 0 ||
+      schema.max_length != nil ||
+      schema.min_items != 0 ||
+      schema.max_items != nil ||
+      schema.min_properties != 0 ||
+      schema.max_properties != nil ||
+      schema.minimum != nil ||
+      schema.maximum != nil ||
+      schema.unique_items?
   end
 
   class Utils
