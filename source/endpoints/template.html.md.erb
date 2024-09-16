@@ -43,8 +43,11 @@ The following parameters will need to be substituted into the URL path.
 The request body is described by the <%= render_schema_type(request_body.content["application/json"].schema) %>
 schema which contains the following parameters:
 
-<% body_schema = request_body.content["application/json"].schema
-   body_parameters = body_schema.properties %>
+<%
+schema = request_body.content["application/json"].schema
+body_schema = schema || schema.all_of[0]
+body_parameters = body_schema.properties
+%>
 
 <table>
   <thead>
