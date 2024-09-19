@@ -16,19 +16,19 @@ class ApiReferencePagesExtension < Middleman::Extension
   # @param [List<Middleman::Sitemap::Resource>] resources
   # @return [List<Middleman::Sitemap::Resource>]
   def manipulate_resource_list(resources)
-    api_path = @config[:api_path]
+    api_docs_path = @config[:api_docs_path]
 
-    if api_path.nil?
+    if api_docs_path.nil?
       return resources
     end
 
-    document = if uri?(api_path)
-                 Openapi3Parser.load_url(api_path)
-               elsif File.exist?(api_path)
+    document = if uri?(api_docs_path)
+                 Openapi3Parser.load_url(api_docs_path)
+               elsif File.exist?(api_docs_path)
                  # Load api file and set existence flag.
-                 Openapi3Parser.load_file(api_path)
+                 Openapi3Parser.load_file(api_docs_path)
                else
-                 raise "Unable to load api path from tech-docs.yml"
+                 raise "Unable to load `api_docs_path` from config/tech-docs.yml"
                end
 
     new_resources = []
