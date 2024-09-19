@@ -1,18 +1,18 @@
 # Host to use for canonical URL generation (without trailing slash)
-host: https://docs.explore-education-statistics.service.gov.uk
+host: https://docs.statistics.api.education.gov.uk
 contact_email: explore.statistics@education.gov.uk
 
 # Header-related options
 show_govuk_logo: false
 service_name: Explore education statistics API
-service_link: https://docs.explore-education-statistics.service.gov.uk
+service_link: https://docs.statistics.api.education.gov.uk
 phase: Beta
 
 # Links to show on right-hand-side of header
 header_links:
   Support: /support
 footer_links:
-  Accessibility: /accessibility/
+  Accessibility statement: /accessibility-statement/
 
 # Table of contents depth – how many levels to include in the table of contents.
 # If your ToC is too long, reduce this number and we'll only show higher-level

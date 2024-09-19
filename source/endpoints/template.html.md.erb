@@ -45,8 +45,8 @@ schema which contains the following parameters:
 
 <%
 schema = request_body.content["application/json"].schema
-body_schema = schema || schema.all_of[0]
-body_parameters = body_schema.properties
+body_schema = schema.type.nil? && schema.all_of&.count == 1 ? schema.all_of[0] : schema
+body_parameters = get_schema_properties(schema)
 %>
 
 <table>

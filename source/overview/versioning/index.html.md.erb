@@ -1,13 +1,13 @@
 ---
 title: Versioning
-last_reviewed_on: 2023-04-05
+last_reviewed_on: 2024-09-18
 review_in: 6 months
 weight: 4
 ---
 
 # Versioning
 
-The Explore Education Statistics API uses URL-based versioning. Each endpoint encodes its current
+The Explore Education Statistics (EES) API uses URL-based versioning. Each endpoint encodes its current
 version within its URL e.g. `/api/v1/the-endpoint`, `/api/v2/the-endpoint`, etc.
 
 When backwards-incompatible changes to an endpoint are unavoidable, a new version of the endpoint
@@ -18,24 +18,41 @@ will be published. Backwards-incompatible changes may include things like:
 - changing validation rules for the request
 
 In the event that a new endpoint version is necessary, the previous version(s) of the endpoint will
-be maintained for as long as possible. This should provide ample opportunity to migrate to the new
-endpoint version. If necessary, guidance may be provided to support migrating to the new version.
+be maintained for as long as possible. This should provide sufficient opportunity to migrate to the
+new endpoint version.
 
-## Data set stability
+For new major API versions, guidance on migrating your existing code will be published in the
+changelog documentation for the API.
 
-Data sets available through this API should be amongst the most stable offered by Explore education
-statistics, however, changes may be introduced to these data sets over time.
+## Data set versioning
 
-The following things can change:
+Data sets available through this API may introduce changes over time. Similar to other types of
+versioning, major or minor versions will be published as required.
 
-- new facets can be added
-- new data values can be added
-- a facet's human-readable label
-- existing data values can be changed or removed
+The following are considered **major** (breaking) changes:
 
-The following guarantees can be made in terms of stability:
+- facets (filters, geographic levels, locations, time periods) were deleted
+- indicators were deleted
 
-- a facet's identifier (or ID) is permanent
-- existing facets cannot be deleted
+The following are considered **minor** changes:
 
-Integrations that query data sets are not expected to break when new releases are published.
+- facets were added
+- facet options were added
+- facet details were updated (e.g. label, hint)
+- facet options were updated (e.g. label)
+- indicators were added
+- indicator details were updated (e.g. label, unit, decimal places)
+- data values were updated
+
+As long as you have specified a data set version to use, any query that you have previously created
+should continue to work as normal regardless of new versions being published.
+
+### Upgrading to newer versions
+
+When you wish to upgrade a query to use a newer data set version, it's important to check the
+changes introduced by the version and consider if they affect your consuming code.
+
+You can find lists of changes via:
+
+- the data set's changelog on its details page on the EES website (see [Data catalogue](https://explore-education-statistics.service.gov.uk/data-catalogue))
+- the [Get a data set version's changes](/endpoints/GetDataSetVersionChanges/index.html) endpoint

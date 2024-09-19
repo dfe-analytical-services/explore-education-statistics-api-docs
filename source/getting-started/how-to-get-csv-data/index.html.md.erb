@@ -1,6 +1,6 @@
 ---
 title: How to get CSV data
-last_reviewed_on: 2023-04-04
+last_reviewed_on: 2024-09-16
 review_in: 6 months
 weight: 2
 ---
@@ -28,90 +28,19 @@ Every data set is created from an underlying CSV file that contains  **all** the
 it useful (or necessary) to work with the underlying CSV instead of interacting with the data set
 via the API.
 
-The underlying CSV file can be downloaded via the [Get a data set file](/endpoints/GetDataSetFile/index.html)
+The underlying CSV file can be downloaded via the [Download data set CSV](/endpoints/DownloadDataSetCsv/index.html)
 endpoint. To use this endpoint, you need to make a `GET` request:
 
 ```
-GET <%= api_url "/api/v1/data-sets/{dataSetId}/file" %>
+GET <%= api_url "/api/v1/data-sets/{dataSetId}/csv" %>
 ```
 
 In the request URL, you'd substitute the `{dataSetId}` parameter with your chosen data set's ID.
 
-Upon making this request, a download containing the CSV data should start.
+Upon making this request, a download containing the CSV data should start. The file will
+be gzip compressed (like most of the API responses), meaning that your HTTP client will need to
+support gzip decompression to extract the contents.
 
-Note that the file will be gzip compressed (like most of the API responses), meaning that your HTTP
-client will need to support gzip decompression to extract the contents.
-
-## Get an entire data set as a ZIP file
-
-If you'd like to download the entire data set as a ZIP file (so it is pre-compressed for
-efficient storage), you can also use the [Get a data set file](/endpoints/GetDataSetFile/index.html)
-endpoint for this.
-
-To do this, simply change the `Accept` header in the request to `application/zip`:
-
-```
-GET <%= api_url "/api/v1/data-sets/{dataSetId}/file" %>
-Accept: application/zip
-```
-
-Note that the ZIP file will also contain other files relevant to the data set, such as its metadata.
-
-## Get data set query results in CSV format
-
-Queries can be run against data sets to find data matching specific criteria using the
-[Query a data set](/endpoints/QueryDataSetPost/index.html) endpoint. By default, this endpoint returns
-the data in JSON format, however, you can also opt to return it in CSV format.
-
-You can do this by changing the `POST` request's `Accept` header to `text/csv`. This would look
-something like the following:
-
-```
-POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
-Accept: text/csv
-
-{
-  # your query
-}
-```
-
-As usual, substitute the `{dataSetId}` parameter with your chosen data set's ID.
-
-The CSV data will be formatted as it would appear in the full data set CSV file, but it is filtered
-down to only contain the data that matches your query.
-
-It is very important to note that the CSV data is **paginated**, consequently, the response's data
-will be split into pages (or batches). To get all the data, you'll have to make multiple
-requests.
-
-### How is CSV formatted data paginated?
-
-As part of a data set query request, the `page` and `pageSize` query parameters can be set to fetch
-different pages of data. For example, the following request would fetch page 5, with each page
-containing a maximum of 200 data results:
-
-```
-POST <%= api_url "/api/v1/data-sets/{dataSetId}/query?page=5&pageSize=200" %>
-Accept: text/csv
-```
-
-Unlike a typical JSON formatted response, the paging details are contained in the response
-headers. These will typically look like the following:
-
-```
-Page: 2
-Page-Size: 500
-Total-Results: 1500
-Total-Pages: 3
-Link: </api/v1/data-sets/{dataSetId}/query?page=1&pageSize=500>; rel="prev",
-      </api/v1/data-sets/{dataSetId}/query?page=3&pageSize=500>; rel="next"
-```
-
-These headers essentially mirror the paging details that can be found in a paginated JSON response.
-More information about these paging details is covered in the [Pagination overview](/overview/pagination/index.html).
-
-A notable difference here is that links are found in the `Link` header. This is outputted in a
-format described in [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288.html).
-
-Similar to links for a paginated JSON response, the `Link` header can be used to navigate directly
-to the previous or next page (if any exists).
+It should be noted that the CSV data will be use human-readable labels for its contents instead of
+machine-readable identifiers. This means that unlike the rest of the API, there are no backward
+compatibility guarantees between different versions of the data set.

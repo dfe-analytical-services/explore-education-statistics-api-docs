@@ -1,7 +1,7 @@
 ---
 title: Debugging data set queries
-last_reviewed_on: 2023-03-11
-review_in: 6 months
+last_reviewed_on: 2024-09-16
+review_in: 12 months
 weight: 4
 ---
 
@@ -40,7 +40,7 @@ When there is an error response, the body will typically look like:
 }
 ```
 
-The response body is modelled by the [ApiErrorViewModel](/schemas/ApiErrorViewModel/index.html) schema,
+The response body is modelled by the [ProblemDetailsViewModel](/schemas/ProblemDetailsViewModel/index.html) schema,
 which attempts to detail the reason(s) why the request failed. The following fields are always
 included:
 
@@ -58,25 +58,28 @@ field which looks like:
   "title": "There are validation errors with the request.",
   "type": "Bad Request",
   "status": 400,
-  "errors": {
-    "theField": [
-      {
-        "message": "Error message",
-        "code": "error.code"
-      }
-    ]
-  }
+  "errors": [
+    {
+      "message": "Error message",
+      "code": "error.code",
+      "path": "theField"
+    }
+  ]
 }
 ```
 
-The `errors` are grouped by the respective parameter (in the request) that they relate to. For example,
-in the above example, there is a single error relating to the request's `theField` parameter.
+The `errors` property contains a list of errors. Each error corresponds to a specific problem and
+will at least contain a `message` (describing the issue) and a `code` (for further debugging and
+parsing).
 
-Each error in `errors` corresponds to a specific problem and will at least contain a `message`
-(describing the issue) and a `code` (for further debugging and parsing). An error may also contain
-a `details` field that provides more information about the specific problem.
+If the error relates to a specific part of the request, the `path` property is used to describe the
+path to request property that caused the error. If this is omitted or empty, it means the error is
+'global' and relates to the entire request.
 
-Validation errors (and error responses) are covered in much more detail in the section on
+Where possible, errors may also contain a `detail` field that provides more detailed information
+about the problem.
+
+Validation errors and error responses in general are covered in much more detail in the section on
 [Error handling](/overview/error-handling/index.html).
 
 ## Validation errors for data set queries
@@ -94,7 +97,7 @@ use the wrong data type for their values. For example, a query with the followin
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "filters": {
       "eq": ["filter-1"]
     }
@@ -106,14 +109,13 @@ Will result in an error response like:
 
 ```json
 {
-  "errors": {
-    "facets.filters.eq": [
-      {
-        "message": "must be a string",
-        "code": "type"
-      }
-    ]
-  }
+  "errors": [
+    {
+      "message": "Must be a valid value. Check that the type and format are correct.",
+      "path": "criteria.filters.eq",
+      "code": "InvalidValue"
+    }
+  ]
 }
 ```
 
@@ -126,7 +128,7 @@ To correct the error, you can simply change `eq` to `in`:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "filters": {
       "in": ["filter-1"]
     }
@@ -138,7 +140,7 @@ Alternatively, the array can be replaced with a single filter item ID string:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "filters": {
       "eq": "filter-1"
     }
@@ -156,7 +158,7 @@ such as `and`, `or` and `not`. For example:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "not": [
       {
         "filters": {
@@ -173,27 +175,26 @@ incompatible and will result in an error response like:
 
 ```json
 {
-  "errors": {
-    "facets.not": [
-      {
-        "message": "must be object",
-        "code": "type"
-      }
-    ]
-  }
+  "errors": [
+    {
+      "message": "Must be a valid value. Check that the type and format are correct.",
+      "path": "criteria.not",
+      "code": "InvalidValue"
+    }
+  ]
 }
 ```
 
 #### Solution
 
-Check that your query correctly follows the [DataSetQuery](/schemas/DataSetQuery/index.html) schema.
-Pay close attention to any usages of condition clauses.
+Check that your query correctly follows the [DataSetQueryRequest](/schemas/DataSetQueryRequest/index.html)
+schema. Pay close attention to any usages of condition clauses.
 
 The `and` / `or` clauses accept **multiple** criteria or condition clauses in an array:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "and": [
       {
         "filters": { "eq": "..." }
@@ -210,7 +211,7 @@ The `not` clause only accepts a **single** condition clause:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "not": {
       "filters": { "eq": "..." }
     }
@@ -237,14 +238,12 @@ Warnings in the response typically look like the following:
     "totalResults": 150,
     "totalPages": 2
   },
-  "warnings": {
-    "facets": [
-      {
-        "message": "No results matched the facet criteria. You may need to refine your query.",
-        "code": "results.empty"
-      }
-    ]
-  },
+  "warnings": [
+    {
+      "message": "The query did not match any results. You may need to refine your criteria.",
+      "code": "QueryNoResults"
+    }
+  ],
   "results": [...]
 }
 ```
@@ -258,14 +257,12 @@ If a query does not return any results, you'll receive a warning like:
 
 ```json
 {
-  "warnings": {
-    "facets": [
-      {
-        "message": "No results matched the facet criteria. You may need to refine your query.",
-        "code": "results.empty"
-      }
-    ]
-  }
+  "warnings": [
+    {
+      "message": "The query did not match any results. You may need to refine your criteria.",
+      "code": "QueryNoResults"
+    }
+  ]
 }
 ```
 
@@ -299,17 +296,16 @@ When there are missing facets, a response will look like:
 
 ```json
 {
-  "warnings": {
-    "facets.filters.in": [
-      {
-        "message": "Could not find items.",
-        "code": "notFound",
-        "details": {
-          "items": ["invalid-filter-1", "invalid-filter-2"]
-        }
+  "warnings": [
+    {
+      "message": "One or more filters could not be found.",
+      "path": "criteria.filters.in",
+      "code": "FiltersNotFound",
+      "details": {
+        "items": ["invalid-filter-1", "invalid-filter-2"]
       }
-    ]
-  }
+    }
+  ]
 }
 ```
 
@@ -340,45 +336,40 @@ The response will then be modified to return results that look like the followin
 ```json
 {
   "filters": {
-    "ethnicity": "eEnWzOY4 :: Asian - Chinese",
-    "language": "3Znkgnda :: Total",
-    "phase_type_grouping": "jXnJKBza :: State-funded secondary"
+    "Z3PMP :: ethnicity": "bqJZ4 :: Asian - Chinese",
+    "eW168 :: language": "LVRpO :: Total",
+    "b0yZ4 :: phase_type_grouping": "RXIeh :: State-funded secondary"
   },
   "timePeriod": {
     "code": "AY",
-    "year": 202122
+    "period": "2021/2022"
   },
-  "geographicLevel": "LocalAuthority",
+  "geographicLevel": "LA",
   "locations": {
-    "Country": "gM6LArwJ :: England :: E92000001",
-    "Region": "lV6qPWr7 :: East Midlands :: E12000004",
-    "LocalAuthority": "qn6OaRed :: Derby :: E06000015"
+    "NAT": "dv84z :: England :: E92000001",
+    "REG": "T4Y1o :: East Midlands :: E12000004",
+    "LA": "vNVmD :: Derby :: E06000015"
   },
   "values": {
-    "headcount": "79",
-    "percent_of_pupils": "0.429161234"
+    "dv84z :: headcount": "79",
+    "vNVmD :: percent_of_pupils": "0.429161234"
   }
 }
 ```
 
-As you can see from the above, the values of `filters` and `locations` now contain human-readable
-labels and the facet ID in the format:
+The keys and values of `filters`, `locations` and `values` are changed to display human-readable
+labels and facet IDs in the format `{facet ID} :: {label}`.
 
-```
-{facet ID} :: {human readable label}
-```
+Enabling debug mode is useful to avoid having to cross-reference the facets of each result with the
+data set's metadata (using the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
 
-Enabling debug mode is particularly useful to avoid having to cross-reference the facets of each
-result with the data set's metadata (using the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
-endpoint).
-
-However, it is important to note that debug mode **should not** be used outside of development/debugging
+However, it is important to note that debug mode **should not** be used outside of development / debugging
 purposes. When your query's issues have been resolved, you should disable debug mode before pushing
 your query to production.
 
 Using debug mode in production comes with significant issues such as:
 
-- much larger (~2-3x) response sizes resulting in wasted bandwidth and slower responses
-- slower responses due to the increased server-side processing required
-- faster and harsher enforcement of rate limits
-- requiring additional parsing of the facet ID and label to be useful
+- much larger (~2-3x) responses that consume more bandwidth
+- slower responses due to extra server-side processing needed
+- being subject to lower rate limits
+- needing additional client-side parsing of the human-readable labels and facet IDs

@@ -1,7 +1,7 @@
 ---
 title: Creating advanced data set queries
-last_reviewed_on: 2023-12-08
-review_in: 6 months
+last_reviewed_on: 2024-09-16
+review_in: 12 months
 weight: 3
 ---
 
@@ -33,13 +33,13 @@ examples.
 
 ## The basic query syntax
 
-Data set queries are issued by making a POST request to the [Query a data set](/endpoints/QueryDataSetPost/index.html)
+Data set queries can be made using a POST request to the [Query a data set](/endpoints/QueryDataSetPost/index.html)
 endpoint. At its most basic, such a request would look like the following:
 
 ```
 POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
 {
-  "facets": {},
+  "criteria": {},
   "indicators": []
 }
 ```
@@ -53,7 +53,7 @@ contain a list of indicator IDs. For example, using the following indicators:
 
 ```json
 {
-  "indicators": ["id-for-indicator-1", "name-of-indicator-2"]
+  "indicators": ["7SJdk", "1J57c"]
 }
 ```
 
@@ -62,8 +62,8 @@ Each result in the response would look like the following:
 ```json
 {
   "values": {
-    "id-of-indicator-1": "123",
-    "id-of-indicator-2": "245"
+    "7SJdk": "123",
+    "1J57c": "245"
   }
 }
 ```
@@ -72,33 +72,34 @@ Note that the values are keyed by their indicator's respective name rather than 
 
 ### Facet types
 
-The `facets` property controls what results will be in the response by filtering them based on the
+The `criteria` property controls what results will be in the response by filtering them based on the
 query criteria specified.
 
-At its most simple, the `facets` should be composed of a **criteria object** that can contain any of
-the following facet properties:
+At its most simple, the `criteria` should contain a **facets object** that can have any of the
+following properties:
 
-| Facet type         | Description                              | Examples                              |
-|--------------------|------------------------------------------|---------------------------------------|
-| `filters`          | IDs of filter items                      | `Yy6yonLA`                            |
-| `timePeriods`      | Time periods in `year` and `code` format | `{ "year": 202223, "code": "AY" }`    |
-| `locations`        | IDs or codes of locations                | `qn6OaRed`, `E12000001`               |
-| `geographicLevels` | Geographic level codes                   | `LocalAuthority`, `Region`, `Country` |
+| Property           | Description                          | Facet option examples                                                            |
+|--------------------|--------------------------------------|----------------------------------------------------------------------------------|
+| `filters`          | Filter by filter option ID           | `1oX7c`, `uKR2K`                                                                 |
+| `geographicLevels` | Filter by geographic level code      | `LA`, `REG`, `NAT`                                                               |
+| `locations`        | Filter by location option ID or code | `{ "level: "REG", "code": "E12000001" }`,<br/>`{ "level: "NAT", "id": "2FmYX" }` |
+| `timePeriods`      | Filter by time period                | `{ "period": "2022/2023", "code": "AY" }`                                        |
 
-All the facet properties are *optional*, and you can use as many (or as little) as you want to
-fulfil your query's requirements.
+
+Note that all the facet properties are **optional** so you only need to use the ones relevant to
+your query.
 
 #### Using IDs or codes for locations
 
-It should be noted that `locations` can accept IDs (e.g. `qn6OaRed`) and codes (e.g. `E12000001`).
+It should be noted that `locations` can accept IDs (e.g. `2FmYX`) and codes (e.g. `E12000001`).
 These will match locations in significantly different ways:
 
 - an ID will only refer to a **single** location
 - a code may refer to **multiple** locations
 
 Location codes are typically unique, but the same code may be used across multiple locations.
-This may produce unexpected results, so it is recommended to use IDs where possible to only get the
-precise locations you are interested in.
+This may produce unexpected results in cases where codes are re-used, so it is recommended to use
+IDs where possible to only get the exact locations you are interested in.
 
 ### Facet comparators
 
@@ -107,56 +108,58 @@ how the facet's values should be compared when filtering the results.
 
 The full list of comparators permitted is as follows:
 
-| Comparator | Description                      | Multiple values? | Example                                   |
-|------------|----------------------------------|------------------|-------------------------------------------|
-| `eq`       | Equal to a value                 | No               | `"eq": "facet-id"`                        |
-| `notEq`    | Not equal to a value             | No               | `"notEq": "facet-id"`                     |
-| `in`       | In a set of values               | Yes              | `"in": ["facet-id-1", "facet-id-2"]`      |
-| `notIn`    | Not in a set of values           | Yes              | `"notIn": ["facet-id-1", "facet-id-2"]`   |
-| `lte`      | Less than or equal to a value    | No               | `"lte": { "year": 202223, "code": "AY" }` |
-| `lt`       | Less than a value                | No               | `"lt": { "year": 202223, "code": "AY" }`  |
-| `gte`      | Greater than or equal to a value | No               | `"gte": { "year": 202223, "code": "AY" }` |
-| `gt`       | Greater than a value             | No               | `"gt": { "year": 202223, "code": "AY" }`  |
+| Comparator | Description              | Multiple values? | Example                                          |
+|------------|--------------------------|------------------|--------------------------------------------------|
+| `eq`       | Equal to                 | No               | `"eq": "1oX7c"`                                  |
+| `notEq`    | Not equal to             | No               | `"notEq": "1oX7c"`                               |
+| `in`       | In a set                 | Yes              | `"in": ["1oX7c", "uKR2K"]`                       |
+| `notIn`    | Not in a set             | Yes              | `"notIn": ["1oX7c", "uKR2K"]`                    |
+| `lte`      | Less than or equal to    | No               | `"lte": { "period": "2022/2023", "code": "AY" }` |
+| `lt`       | Less than                | No               | `"lt": { "period": "2022/2023", "code": "AY" }`  |
+| `gte`      | Greater than or equal to | No               | `"gte": { "period": "2022/2023", "code": "AY" }` |
+| `gt`       | Greater than             | No               | `"gt": { "period": "2022/2023", "code": "AY" }`  |
 
-Note that facet properties may only permit certain comparators to be used. Consult
-the [schema documentation](/schemas/DataSetQueryCriteria/index.html) for each facet property to see
-if a comparator is allowed.
+Note that facet properties may only permit certain comparators to be used. Consult the
+[schema documentation](/schemas/DataSetQueryCriteriaFacets/index.html) for each facet property to see if a
+comparator is allowed.
 
-Using all of the above information, you could write a query that looks like the following:
+Using all the above information, you could write a query that looks like the following:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "filters": {
-      "in": ["filter-1", "filter-2"]
+      "in": ["qtY3J", "psUkV"]
     },
     "timePeriod": {
-      "gte": { "year": 201819, "code": "AY" },
-      "lte": { "year": 202223, "code": "AY" }
+      "gte": { "period": "2018/2019", "code": "AY" },
+      "lte": { "period": "2022/2023", "code": "AY" }
     },
     "locations": {
-      "notIn": ["location-1", "location-2"]
+      "notIn": [
+        { "level": "REG", "id": "0rWTr" },
+        { "level": "REG", "id": "pn6kV" }
+      ]
     },
     "geographicLevel": {
-      "eq": "LocalAuthority"
+      "eq": "LA"
     }
   }
 }
 ```
 
-The results will be filtered so that they:
+The results will be filtered so they:
 
-- match either `filter-1` or `filter-2`
+- match either filter options `qtY3J` or `psUkV`
 - are between the 2018/19 and 2022/23 academic years
-- are not in `location-1` or `location-2`
-- are only for local authorities
+- don't match location options `0rWTr` or `pn6kV`
+- only contain local authority level data
 
 It should be noted that **all parts** of the query criteria must resolve to true for a result to be
 included in the response.
 
-The above query may be suitable for simple queries, however, you may sometimes need to express
-more complex requirements. In the next section, you'll explore some of the more advanced query
-syntax available.
+Whilst the above query may be suitable for simpler queries, you may have more complex requirements.
+In the next section, you'll explore some of the more advanced query syntax available.
 
 ## Queries with condition clauses
 
@@ -174,22 +177,22 @@ condition to be true. The syntax for this looks like the following:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "and": [
       {
         "filters": {
-          "in": ["filter-1", "filter-2"]
+          "in": ["qtY3J", "psUkV"]
         }
       },
       {
         "locations": {
-          "notEq": "location-1"
+          "notEq": { "level": "REG", "id": "0rWTr" }
         }
       },
       {
         "timePeriods": {
-          "gte": { "year": 201819, "code": "AY" },
-          "lte": { "year": 202223, "code": "AY" }
+          "gte": { "period": "2018/2019", "code": "AY" },
+          "lte": { "period": "2022/2023", "code": "AY" }
         }
       }
     ]
@@ -199,32 +202,33 @@ condition to be true. The syntax for this looks like the following:
 
 The results will be filtered so that they:
 
-- match either `filter-1` or `filter-2`
-- are not in `location-1`
+- match either filter options `qtY3J` or `psUkV`
+- don't match location option `0rWTr`
 - are between the 2018/19 and 2022/23 academic years
 
-At this point, you may notice that the `and` condition filters results in a similar way to a
-typical criteria object. This is indeed the case - criteria objects are essentially a shorthand
-way to write `and` conditions.
-
-The earlier example would be equivalent to the following:
+Note that a facet object is equivalent to a set of `and` conditions as it combines all of its
+clauses together using a logical AND. The earlier example would be equivalent to the following
+facet object:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "filters": {
-      "in": ["filter-1", "filter-2"]
+      "in": ["qtY3J", "psUkV"]
     },
     "locations": {
-      "notEq": "location-1"
+      "notEq": { "level": "REG", "id": "0rWTr" }
     },
     "timePeriods": {
-      "gte": { "year": 201819, "code": "AY" },
-      "lte": { "year": 202223, "code": "AY" }
+      "gte": { "period": "2018/2019", "code": "AY" },
+      "lte": { "period": "2022/2023", "code": "AY" }
     }
   }
 }
 ```
+
+It's typically simpler to use facet objects instead of combining multiple clauses using an `and`
+condition. Facet objects are more compact and their use should be preferred where possible.
 
 ### The 'or' condition
 
@@ -233,23 +237,23 @@ for the overall condition to be true. The syntax for this looks like the followi
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "or": [
       {
         "filters": {
-          "eq": "filter-1"
+          "eq": "qtY3J"
         },
         "timePeriods": {
-          "gte": { "year": 201617, "code": "AY" },
-          "lte": { "year": 201718, "code": "AY" }
+          "gte": { "period": "2016/2017", "code": "AY" },
+          "lte": { "period": "2017/2018", "code": "AY" }
         }
       },
       {
         "filters": {
-          "eq": "filter-2"
+          "eq": "psUkV"
         },
         "timePeriods": {
-          "gte": { "year": 202122, "code": "AY" }
+          "gte": { "period": "2021/2022", "code": "AY" }
         }
       }
     ]
@@ -257,32 +261,32 @@ for the overall condition to be true. The syntax for this looks like the followi
 }
 ```
 
-The results will be filtered so that they:
+The results will be filtered so that they either match:
 
-- match `filter-1` and are between the 2016/17 and 2017/18 academic years
-- or, match `filter-2` and are after the 2021/22 academic year
+- filter option `qtY3J` and are between the 2016/17 and 2017/18 academic years
+- filter option `psUkV` and are after the 2021/22 academic year
 
-As you can see, the `or` condition is particularly useful for expressing complex queries where
-there are multiple sets of distinct criteria. A good use-case is for matching on multiple ranges of
-time periods (like the above example).
+The `or` condition is particularly useful for expressing complex queries where there are multiple
+sets of distinct criteria. A good use-case is for matching on multiple ranges of time periods
+like the above example.
 
 ### The 'not' condition
 
-The `not` condition can be used when a condition **must not** be true, essentially negating the
+The `not` condition can be used when a condition **must not** be true, hence it negates the
 condition's result.
 
-Unlike, the `and`/`or` conditions, the `not` condition operates on a single sub-clause and the
+Unlike, the `and` / `or` conditions, the `not` condition operates on a single sub-clause and the
 syntax looks like the following:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "not": {
       "filters": {
-        "eq": "filter-1"
+        "eq": "qtY3J"
       },
       "timePeriods": {
-        "gt": { "year": 202122, "code": "AY" }
+        "gt": { "period": "2021/2022", "code": "AY" }
       }
     }
   }
@@ -291,41 +295,41 @@ syntax looks like the following:
 
 The results will be filtered so that they **must not**:
 
-- match `filter-1`
+- match filter option `qtY3J`
 - be after the 2021/21 academic year
 
-It's not recommended to use the 'not' condition for cases where a standard criteria object would
-suffice. A criteria object can contain negated comparators such `notEq`, `notIn`, etc, and can
-typically express the same things that the 'not' condition can.
+It's not recommended to use a 'not' condition for cases where a standard facet object would suffice.
+A facet object can contain negated comparators such `notEq`, `notIn`, etc, and can typically express
+the same things that the 'not' condition can.
 
 ## Chaining conditions
 
-In the most complex kinds of queries, you may need to chain multiple conditions together. With the
-API, it's possible to do this as the query syntax allows all condition objects to contain either
-criteria *or* condition objects.
+In more complex queries, you may need to chain multiple conditions together. With the API, it's
+possible to do this as the query syntax allows condition objects to contain either facet or
+another condition objects in a nested way.
 
 For example, a query like the following is possible:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "and": [
       {
         "filters": {
-          "eq": "filter-1"
+          "eq": "qtY3J"
         }
       },
       {
         "or": [
           {
             "timePeriods": {
-              "gte": { "year": 201617, "code": "AY" },
-              "lte": { "year": 201718, "code": "AY" }
+              "gte": { "period": "2016/2017", "code": "AY" },
+              "lte": { "period": "2017/2018", "code": "AY" }
             }
           },
           {
             "timePeriods": {
-              "gt": { "year": 202021, "code": "AY" }
+              "gt": { "period": "2020/2021", "code": "AY" }
             }
           }
         ]
@@ -337,32 +341,31 @@ For example, a query like the following is possible:
 
 The results will be filtered so that they:
 
-- match `filter-1`
-- are between the 2016/17 and 2017/18 academic years
-  - or, are after the 2020/21 academic year
+- match filter option `qtY3J`
+- are between the 2016/17 and 2017/18 academic years, or after the 2020/21 academic year
 
 The `not` condition can also contain other condition objects. For example:
 
 ```json
 {
-  "facets": {
+  "criteria": {
     "not": {
       "or": [
         {
           "filters": {
-            "eq": "filter-1"
+            "eq": "qtY3J"
           },
           "timePeriods": {
-            "gte": { "year": 201617, "code": "AY" },
-            "lte": { "year": 201718, "code": "AY" }
+            "gte": { "period": "2016/2017", "code": "AY" },
+            "lte": { "period": "2017/2018", "code": "AY" }
           }
         },
         {
           "filters": {
-            "eq": "filter-2"
+            "eq": "psUkV"
           },
           "timePeriods": {
-            "gt": { "year": 202122, "code": "AY" }
+            "gt": { "period": "2021/2022", "code": "AY" }
           }
         }
       ]
@@ -371,10 +374,10 @@ The `not` condition can also contain other condition objects. For example:
 }
 ```
 
-The results will be filtered so that they **must not**
+The results will be filtered so that they **must not**:
 
-- match `filter-1` and be between the 2016/17 and 2017/18 academic years
-- or, match `filter-2` and be after the 2021/22 academic year
+- match filter option `qtY3J` and be between the 2016/17 and 2017/18 academic years
+- match filter option `psUkV` and be after the 2021/22 academic year
 
 There are no limits to how deeply condition objects can be chained and nested. You can use as many
 conditions to express your query's requirements as necessary.
@@ -384,14 +387,13 @@ conditions to express your query's requirements as necessary.
 By default, query results are sorted by their time period in descending order. This means that the
 most recent results will be listed first.
 
-If you want to change the ordering of the results, you can use the query's `sort` property.
+If you want to change the ordering of the results, you can use the query's `sorts` property.
 This property should be a list of sorts that should be applied to the results, for example:
 
 ```json
 {
-  "facets": {...},
-  "sort": [
-    { "name": "TimePeriod", "order": "Asc" }
+  "sorts": [
+    { "field": "timePeriod", "direction": "Asc" }
   ]
 }
 ```
@@ -399,32 +401,37 @@ This property should be a list of sorts that should be applied to the results, f
 This will order results by time period in ascending order, meaning that the oldest results would
 appear first.
 
-The `name` property should be the name of the result field to sort, and the `order` controls the
+The `field` property should be the name of the field to sort, and the `direction` controls the
 sort direction (i.e. `Asc` for ascending, `Desc` for descending).
 
-Possible options for fields that can be sorted (via the `name` property) include:
+Possible options for `field` include:
 
-- `TimePeriod`
-- geographic levels e.g. `Country`, `Region`, `LocalAuthority`, etc
-- filters e.g. `SchoolType`, `Ethnicity` etc
+- `timePeriod` to sort by time period
+- `geographicLevel` to sort by the geographic level of the data
+- `location|{level}` to sort by location options in a geographic level where `{level}` is the level
+  code (e.g. `REG`, `LA`)
+- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)
+- `indicator|{id}` to sort by the values in an indicator where `{id}` is the indicator ID
+  (e.g. `6VfPgZ`)
 
-The exact geographic level and filter name options that can be used will be found in the data set's
-metadata.
+Any geographic levels, filter IDs and indicator IDs found in the data set's metadata can be used
+for sorting.
 
 You can also have multiple sorts to determine the order in tie-break situations. These will be
-applied in the order that they appear in the `sort` list. For example, given the following:
+applied in the order that they appear in the `sorts` list. For example, given the following:
 
 ```json
 {
-  "facets": {...},
-  "sort": [
-    { "name": "TimePeriod", "order": "Desc" },
-    { "name": "Region", "order": "Desc" },
-    { "name": "SchoolType", "order": "Asc" }
+  "sorts": [
+    { "field": "timePeriod", "direction": "Desc" },
+    { "field": "location|REG", "direction": "Desc" },
+    { "field": "filter|q1o13J", "direction": "Asc" }
   ]
 }
 ```
 
-The results will be ordered by time period (in descending order). Results in the same time period
-will be ordered by region (in descending order). Results in the same region will be ordered by
-school type (in ascending order).
+The results will be sorted by:
+
+1. time period in descending order
+2. location options at 'Region' level in descending order (when in the same time period)
+3. filter options in filter `q1o13J` in ascending order (when in the same location option)

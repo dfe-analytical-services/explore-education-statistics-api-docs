@@ -1,24 +1,21 @@
 ---
 title: Overview
-last_reviewed_on: 2023-04-05
+last_reviewed_on: 2024-09-18
 review_in: 6 months
 weight: 3
 ---
 
 # Overview
 
-The Explore education statistics API adheres to REST principles. It uses standard HTTP verbs, JSON
-encoding in message bodies and provides HTTP status codes for different response types.
+The Explore education statistics (EES) API adheres to REST principles. It uses standard HTTP verbs,
+JSON encoding in message bodies and provides HTTP status codes for different response types.
 
-The API acts an interface to the Explore education statistics service, currently allowing you to:
+The API primarily provides access to data sets published by EES, allowing you to:
 
-- get high level information about publications and their stable data sets
-- query data sets for data matching specific criteria
-- download the underlying CSV file of a data set
+- get summary information about data sets and their related resources
+- query data sets based on specific criteria
+- download the underlying CSV files of data sets
 
-With the provided functionality, you should be able to build things using up-to-date, high quality
-data from the Explore education statistics service. Potential ideas for this may include:
-
-- applications and websites
-- dashboards and charts
-- scheduled reports
+Note that not all data sets available in EES are accessible via the API. For a full list of data sets
+published by EES, visit the [Data catalogue](https://explore-education-statistics.service.gov.uk/data-catalogue)
+on the main website.

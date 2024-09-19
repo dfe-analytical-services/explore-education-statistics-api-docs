@@ -16,6 +16,10 @@ module Helpers
     markdown.render(content)
   end
 
+  def host_url
+    config[:tech_docs][:host]
+  end
+
   # @param [String] text
   # @return [String]
   def link_to_contact_md(text = "")

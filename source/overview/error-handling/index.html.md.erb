@@ -1,7 +1,7 @@
 ---
 title: Error handling
-last_reviewed_on: 2023-04-05
-review_in: 6 months
+last_reviewed_on: 2024-09-18
+review_in: 12 months
 weight: 1
 ---
 
@@ -39,8 +39,8 @@ If an error occurs, the EES API will respond with a body that looks like the fol
 }
 ```
 
-The response body is modelled by the [ApiErrorViewModel](/schemas/ApiErrorViewModel/index.html) schema,
-which attempts to detail the reason(s) why the request failed. The following fields are always
+The response body is modelled by the [ProblemDetailsViewModel](/schemas/ProblemDetailsViewModel/index.html)
+schema, which attempts to detail the reason(s) why the request failed. The following fields are always
 included:
 
 | Property | Type   | Description                                                    |
@@ -66,64 +66,62 @@ the following:
   "title": "There are validation errors with the request.",
   "type": "Bad Request",
   "status": 400,
-  "errors": {
-    "theField": [
-      {
-        "message": "Error message",
-        "code": "error.code"
-      }
-    ]
-  }
+  "errors": [
+    {
+      "message": "Error message",
+      "code": "ErrorCode",
+      "path": "someField"
+    }
+  ]
 }
 ```
 
-This response contains the validation errors in the `errors` property. The errors are grouped by the
-respective parameter (in the request) that they relate to. In the above example, there is a single
-error relating to the request's `theField` parameter.
-
-Every validation error will at least contain a `message` property describing the specific problem to
-address.
+This response contains the validation errors in the `errors` property. Every validation error will
+at least contain a `message` property describing the specific problem to address.
 
 Errors will also typically contain a `code` property. These can be useful for diagnosing issues
 further, or for simply parsing errors with consuming code.
 
-Additionally, where possible, errors will contain a `details` property to provide further exact
+If the error relates to a specific part of the request, the `path` property is used to describe the
+path to request property that caused the error. If this is omitted or empty, it means the error is
+'global' and relates to the entire request.
+
+Where possible, errors may also contain a `detail` property to provide further exact
 details about the problem. These do not have a specific structure, but may look something like:
 
 ```json
 {
-  "message": "Cannot contain restricted items.",
-  "code": "notOneOf",
-  "details": {
+  "message": "Must be one of the allowed values.",
+  "code": "AllowedValue",
+  "path": "someField",
+  "detail": {
     "items": [25, 30]
   }
 }
 ```
 
-In the above validation error, the `details` indicates that the numbers 25 and 30 are invalid and
-cannot be used.
+In the above validation error, the `detail` indicates that only the numbers 25 and 30 are values
+that can be used for the `someField` request property.
 
 ### Global errors
 
 If a validation error relates to the request as a whole, there will no specific request parameter
 that it relates to.
 
-These types of validation errors are considered 'global' and are grouped under the `""` property.
-This looks like the following:
+These types of validation errors are considered 'global' and the `path` will be unset or empty. This
+looks like the following:
 
 ```json
 {
   "title": "There are validation errors with the request.",
   "type": "Bad Request",
   "status": 400,
-  "errors": {
-    "": [
-      {
-        "message": "A global error message",
-        "code": "global.error.code"
-      }
-    ]
-  }
+  "errors": [
+    {
+      "message": "A global error message",
+      "code": "GlobalErrorCode"
+    }
+   ]
 }
 ```
 
@@ -138,14 +136,13 @@ It does this by describing a path to the specific parameter using JSONPath notat
   "title": "There are validation errors with the request.",
   "type": "Bad Request",
   "status": 400,
-  "errors": {
-    "some.nested[1].thing": [
-      {
-        "message": "Error message",
-        "code": "error.code"
-      }
-    ]
-  }
+  "errors": [
+    {
+      "message": "Error message",
+      "code": "ErrorCode",
+      "path": "some.nested[1].thing"
+    }
+  ]
 }
 ```
 
