@@ -321,6 +321,44 @@ endpoint.
 Facets are not usually removed from existing data sets, so there may be a typo (or similar) in
 the missing facets.
 
+## Documenting queries with comments
+
+Data set queries can be documented with comments in the JSON body using forward slashes (`//`). You
+can add comments to any part of the query as long as it doesn't result in a malformed JSON structure.
+
+For example, the following is a **valid** query with comments:
+
+```jsonc
+{
+  "criteria": {
+    "filters": {
+      "in": [
+        "n0WqP", // State-funded secondary
+        "hUfBQ" // Gender male
+      ]
+    }
+  }
+}
+```
+
+The following is an **invalid** query with comments:
+
+```jsonc
+{
+  "criteria": {
+    "filters": {
+      "in": [
+        "n0WqP" // State-funded secondary,
+        "hUfBQ" // Gender male
+      ]
+    }
+  }
+}
+```
+
+In the invalid query, the comma needed after `"n0WqP"` has been accidentally placed within the
+adjacent comment causing the JSON to be syntactically invalid.
+
 ## Debug mode
 
 To assist in debugging unexpected results for a data set query, the [Query a data set](/endpoints/QueryDataSetPost/index.html)
