@@ -10,9 +10,9 @@ phase: Beta
 
 # Links to show on right-hand-side of header
 header_links:
-  Support: /support
+  Support: /support/index.html
 footer_links:
-  Accessibility statement: /accessibility-statement/
+  Accessibility statement: /accessibility-statement/index.html
 
 # Table of contents depth – how many levels to include in the table of contents.
 # If your ToC is too long, reduce this number and we'll only show higher-level
