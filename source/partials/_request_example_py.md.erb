@@ -4,9 +4,9 @@ import requests
 url = '<%= url %>'
 <% if body_json %>
 headers = {
-  "Content-Type": "application/json",
+  'Content-Type': 'application/json'
 }
-data = '<%= body_json %>'
+data = '''<%= body_json %>'''
 <% end %>
 
 response = requests.<%= http_method.downcase %>(url<% if body_json %>, headers=headers, data=data<% end %>)
