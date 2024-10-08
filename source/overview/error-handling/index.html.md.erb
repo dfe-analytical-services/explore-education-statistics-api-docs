@@ -16,16 +16,16 @@ within the API itself.
 
 The HTTP status codes that you can typically expect from the API are summarised by the following table:
 
-| Status code | Name                  | Description                                                                                                                    |
-|-------------|-----------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| 200         | OK                    | Success. The API should provide a successful response.                                                                         |
-| 204         | No Content            | Success. The request succeeded, but there was no content in the response.                                                      |
-| 400         | Bad Request           | There were issues (e.g. validation errors) with the request meaning it could not be processed.                                 |
-| 401         | Unauthorized          | The request lacks valid authentication credentials and was denied access.                                                      |
-| 403         | Forbidden             | The request has authentication credentials, but was denied access to the requested resource.                                   |
-| 404         | Not Found             | The requested resource could not be found.                                                                                     |
-| 429         | Too Many Requests     | There were too many requests in a short amount of time. Avoid making further requests, or use an appropriate backoff strategy. |
-| 500         | Internal server error | Something went wrong whilst processing the request. This may require further assistance to resolve.                            |
+| Status code | Name              | Description                                                                                                                    |
+|-------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| 200         | OK                | Success. The API should provide a successful response.                                                                         |
+| 204         | No Content        | Success. The request succeeded, but there was no content in the response.                                                      |
+| 400         | Bad Request       | There were issues (e.g. validation errors) with the request meaning it could not be processed.                                 |
+| 401         | Unauthorized      | The request lacks valid authentication credentials and was denied access.                                                      |
+| 403         | Forbidden         | The request has authentication credentials, but was denied access to the requested resource.                                   |
+| 404         | Not Found         | The requested resource could not be found.                                                                                     |
+| 429         | Too Many Requests | There were too many requests in a short amount of time. Avoid making further requests, or use an appropriate backoff strategy. |
+| 504         | Gateway Timeout   | The request took too long and exceeded the maximum allowed time.                                                               |
 
 ## The error response body
 
