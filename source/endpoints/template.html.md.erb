@@ -61,7 +61,7 @@ body_parameters = get_schema_properties(schema)
   <tbody>
   <% body_parameters.each do |name, parameter| %>
     <tr>
-      <td><code class="dfe-word-break--normal"><%= name %></code></td>
+      <td><code class="app-word-break--normal"><%= name %></code></td>
       <td><%= render_schema_type(parameter) %></td>
       <td><%= body_schema.requires?(parameter) %></td>
       <td>

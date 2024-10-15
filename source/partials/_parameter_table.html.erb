@@ -10,7 +10,7 @@
   <tbody>
   <% parameters.each do |parameter| %>
     <tr>
-      <td><code class="dfe-word-break--normal"><%= parameter.name %></code></td>
+      <td><code class="app-word-break--normal"><%= parameter.name %></code></td>
       <td><%= render_schema_type(parameter.schema) %></td>
       <td><%= parameter.required? %></td>
       <td>

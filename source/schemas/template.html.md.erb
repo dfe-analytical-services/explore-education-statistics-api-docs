@@ -29,7 +29,7 @@ Allowed options:
   <tbody>
   <% properties.each do |name, property| %>
     <tr>
-      <td><code class="dfe-word-break--normal"><%= name %></code></td>
+      <td><code class="app-word-break--normal"><%= name %></code></td>
       <td><%= render_schema_type(property) %></td>
       <td><%= is_required_schema_property?(schema, property) %></td>
       <td>
