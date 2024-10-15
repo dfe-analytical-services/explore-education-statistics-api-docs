@@ -3,7 +3,7 @@ host: https://docs.statistics.api.education.gov.uk
 contact_email: explore.statistics@education.gov.uk
 
 # Header-related options
-show_govuk_logo: false
+show_govuk_logo: true
 service_name: Explore education statistics API
 service_link: https://docs.statistics.api.education.gov.uk
 phase: Beta
