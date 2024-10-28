@@ -15,9 +15,6 @@ gem 'middleman-gh-pages'
 # Include linter to check for dead internal links
 gem 'html-proofer'
 
-# Temporary fix for https://github.com/middleman/middleman/issues/2569
-gem 'haml', '~> 5.0'
-
 gem 'chronic'
 
 gem 'http'
