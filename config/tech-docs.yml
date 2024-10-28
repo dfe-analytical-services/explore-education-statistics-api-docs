@@ -38,3 +38,4 @@ prevent_indexing: true
 # Ownership for page reviews
 default_owner_slack: '#alerts'
 owner_slack_workspace: exploreeducationstats
+show_expiry: false
