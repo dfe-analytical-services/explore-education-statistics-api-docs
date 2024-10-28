@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.0.8.4)
+    activesupport (7.0.8.6)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -42,7 +42,7 @@ GEM
     ethon (0.16.0)
       ffi (>= 1.15.0)
     eventmachine (1.2.7)
-    execjs (2.9.1)
+    execjs (2.10.0)
     fast_blank (1.0.1)
     fastimage (2.3.1)
     ffi (1.17.0)
@@ -172,7 +172,7 @@ GEM
     parslet (2.0.0)
     public_suffix (5.1.1)
     racc (1.8.1)
-    rack (2.2.9)
+    rack (2.2.10)
     rack-livereload (0.3.17)
       rack
     rainbow (3.1.1)
@@ -181,7 +181,7 @@ GEM
     rb-inotify (0.11.1)
       ffi (~> 1.0)
     redcarpet (3.5.1)
-    rexml (3.3.7)
+    rexml (3.3.9)
     rouge (3.30.0)
     sass (3.4.25)
     sassc (2.4.0)
@@ -201,7 +201,7 @@ GEM
       concurrent-ruby (~> 1.0)
     uglifier (3.2.0)
       execjs (>= 0.3.0, < 3)
-    webrick (1.8.1)
+    webrick (1.8.2)
     yell (2.2.2)
     zeitwerk (2.6.18)
 
@@ -218,6 +218,9 @@ DEPENDENCIES
   rake
   tzinfo-data
   wdm (~> 0.1.0)
+
+RUBY VERSION
+   ruby 3.3.5p100
 
 BUNDLED WITH
    2.3.22
