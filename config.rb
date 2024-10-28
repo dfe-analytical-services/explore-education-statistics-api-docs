@@ -9,6 +9,20 @@ require 'html-proofer'
 
 GovukTechDocs.configure(self, livereload: { js_host: "localhost", host: "127.0.0.1" })
 
+# Override config from environment variables
+
+if ENV.has_key?("TECH_DOCS_HOST")
+  config[:tech_docs][:host] = ENV["TECH_DOCS_HOST"] || config[:tech_docs][:host]
+end
+
+if ENV.has_key?("TECH_DOCS_PREVENT_INDEXING")
+  config[:tech_docs][:prevent_indexing] = ENV["TECH_DOCS_PREVENT_INDEXING"]
+end
+
+if ENV.has_key?("TECH_DOCS_API_DOCS_PATH")
+  config[:tech_docs][:api_docs_path] = ENV["TECH_DOCS_API_DOCS_PATH"]
+end
+
 helpers Helpers
 helpers ApiReferenceHelpers
 activate :api_reference_pages
