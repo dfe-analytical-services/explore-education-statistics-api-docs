@@ -1,8 +1,14 @@
 # Explore education statistics API documentation
 
+**⚠️ This repository is no longer maintained ⚠️**
+
+The documentation in this repository has been moved to the [Explore education statistics repository](https://github.com/dfe-analytical-services/explore-education-statistics). Consequently, the docs in this repository
+are no longer maintained and may be out of date.
+
+------
+
 This repository is used to generate the documentation website for the Explore education statistics API.
-It is based on the GOV.UK [Technical Documentation Template](https://tdt-documentation.london.cloudapps.digital/)
-for building 
+It is based on the GOV.UK [Technical Documentation Template](https://tdt-documentation.london.cloudapps.digital/).
 
 ## Pre-requisites
 
